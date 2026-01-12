@@ -1,0 +1,101 @@
+CallID,CustomerID,CustomerName,DateTime,Reason,Agent,Resolution
+CL0001,RC1023,Jessica Lee,2024-05-01 09:03,Billing question,Agent Brown,Explained latest bill and payment options
+CL0002,RC1085,Michael Rodriguez,2024-05-01 09:25,Outage report,Agent Wang,Logged outage and escalated to field services
+CL0003,RC1009,Aisha Patel,2024-05-01 10:11,Service stop request,Agent Smith,Scheduled service stop for 2024-05-10
+CL0004,RC1054,Brian Johnson,2024-05-01 10:50,Payment arrangement,Agent Lee,Set up 2-month payment plan
+CL0005,RC1012,Emily Nguyen,2024-05-01 12:34,High usage inquiry,Agent Patel,Explained seasonal usage increase factors
+CL0006,RC1040,Tony Martinez,2024-05-01 13:10,Solar program inquiry,Agent Brown,Emailed solar program brochure
+CL0007,RC1077,Linda Lopez,2024-05-01 13:47,Update contact info,Agent Garcia,Updated phone and mailing address
+CL0008,RC1096,Amir Singh,2024-05-01 14:15,Billing question,Agent Wang,Corrected billing error; issued adjustment
+CL0009,RC1010,Sarah Kim,2024-05-02 09:55,Service start request,Agent Smith,Scheduled start for 2024-05-05
+CL0010,RC1001,David Anderson,2024-05-02 10:18,Energy efficiency tips,Agent Lee,Provided energy-saving recommendations
+CL0011,RC1036,Chloe White,2024-05-02 10:45,General info,Agent Patel,Directed to city website for programs
+CL0012,RC1018,Maria Hernandez,2024-05-02 11:22,Complaint,Agent Garcia,Escalated complaint to supervisor
+CL0013,RC1044,Paul King,2024-05-02 13:21,Outage report,Agent Brown,Confirmed outage and estimated resolution time
+CL0014,RC1083,Anna Johnson,2024-05-02 14:09,Payment arrangement,Agent Wang,Arranged new payment schedule
+CL0015,RC1095,Nathan Wu,2024-05-02 15:00,Update contact info,Agent Smith,Updated email address
+CL0016,RC1026,Danielle Scott,2024-05-02 15:12,Service stop request,Agent Lee,Scheduled for 2024-05-12
+CL0017,RC1067,Noah Davis,2024-05-02 16:23,Billing question,Agent Patel,Explained rate changes
+CL0018,RC1052,Jade Evans,2024-05-03 08:31,High usage inquiry,Agent Garcia,Provided historical usage comparison
+CL0019,RC1081,William Moore,2024-05-03 09:10,Energy efficiency tips,Agent Brown,Suggested home energy audit
+CL0020,RC1020,Elena Torres,2024-05-03 09:43,Complaint,Agent Wang,Filed complaint about streetlight outage
+CL0021,RC1005,James Williams,2024-05-03 11:03,Service start request,Agent Smith,Scheduled start for 2024-05-07
+CL0022,RC1015,Natalie Perez,2024-05-03 11:55,Billing question,Agent Lee,Clarified usage on last bill
+CL0023,RC1061,Victor Chen,2024-05-03 13:36,Update contact info,Agent Patel,Updated account details
+CL0024,RC1088,Giselle Brown,2024-05-03 15:14,Payment arrangement,Agent Garcia,Set up delayed payment
+CL0025,RC1048,Patricia Wilson,2024-05-03 15:40,Solar program inquiry,Agent Brown,Explained solar incentive options
+CL0026,RC1074,Lucas Sanchez,2024-05-04 09:20,General info,Agent Wang,Directed to city FAQ page
+CL0027,RC1024,Steven Miller,2024-05-04 09:49,Complaint,Agent Smith,Escalated meter reading error
+CL0028,RC1093,Tracy Lee,2024-05-04 10:22,Billing question,Agent Lee,Reviewed charges and credits
+CL0029,RC1003,Benjamin Garcia,2024-05-04 11:08,Outage report,Agent Patel,Reported outage for business
+CL0030,RC1064,Matthew Clark,2024-05-04 12:40,Payment arrangement,Agent Garcia,Set up 3-month payment plan
+CL0031,RC1101,Olivia Carter,2024-05-04 13:05,Service stop request,Agent Brown,Scheduled service stop for 2024-05-15
+CL0032,RC1102,Ethan Brooks,2024-05-04 13:42,Billing question,Agent Wang,Explained due date and late fee policy
+CL0033,RC1103,Mia Rivera,2024-05-04 14:10,Streetlight outage,Agent Smith,Created work order and provided ticket number
+CL0034,RC1104,Jackson Reed,2024-05-04 15:18,High usage inquiry,Agent Lee,Reviewed usage trends and confirmed meter reads
+CL0035,RC1105,Sophia Foster,2024-05-05 08:55,Service start request,Agent Patel,Scheduled start for 2024-05-08
+CL0036,RC1106,Liam Price,2024-05-05 09:30,Payment arrangement,Agent Garcia,Set up 4-week payment extension
+CL0037,RC1107,Ava Coleman,2024-05-05 10:02,Solar program inquiry,Agent Brown,Provided eligibility requirements and application link
+CL0038,RC1108,Noah Bennett,2024-05-05 10:41,Update contact info,Agent Wang,Updated mailing address
+CL0039,RC1109,Isabella Diaz,2024-05-05 11:20,Complaint,Agent Smith,Documented concern and routed to customer relations
+CL0040,RC1110,Lucas Morgan,2024-05-05 13:08,General info,Agent Lee,Answered questions about online account access
+CL0041,RC1111,Charlotte Hughes,2024-05-06 09:12,Outage report,Agent Patel,Confirmed localized outage and shared restoration estimate
+CL0042,RC1112,Henry Ross,2024-05-06 09:40,Billing question,Agent Garcia,Explained prorated charges for move-in date
+CL0043,RC1113,Amelia Ward,2024-05-06 10:15,Energy efficiency tips,Agent Brown,Provided rebate list and thermostat recommendations
+CL0044,RC1114,Daniel Nguyen,2024-05-06 11:07,Service stop request,Agent Wang,Scheduled service stop for 2024-05-14
+CL0045,RC1115,Grace Kim,2024-05-06 13:22,High usage inquiry,Agent Smith,Advised appliance checks and offered usage report email
+CL0046,RC1116,Samuel Turner,2024-05-06 14:06,Streetlight outage,Agent Lee,Logged location details and submitted maintenance request
+CL0047,RC1117,Victoria Allen,2024-05-06 15:33,Payment arrangement,Agent Patel,Set up 2-installment payment plan
+CL0048,RC1118,Andrew Collins,2024-05-07 08:50,Billing question,Agent Garcia,Corrected duplicate charge and confirmed credit timing
+CL0049,RC1119,Zoe Phillips,2024-05-07 09:28,Service start request,Agent Brown,Scheduled start for 2024-05-09
+CL0050,RC1120,Christopher Evans,2024-05-07 10:05,Outage report,Agent Wang,Logged outage and notified field crew
+CL0051,RC1121,Hannah Stewart,2024-05-07 10:44,Update contact info,Agent Smith,Updated phone number and preferred contact method
+CL0052,RC1122,Ryan Patterson,2024-05-07 11:19,Solar program inquiry,Agent Lee,Explained net metering process and next steps
+CL0053,RC1123,Lily Jenkins,2024-05-07 13:01,Complaint,Agent Patel,Escalated complaint and scheduled follow-up call
+CL0054,RC1124,Jonathan Flores,2024-05-07 14:37,Energy efficiency tips,Agent Garcia,Recommended LED streetlight conversion program info
+CL0055,RC1125,Evelyn Howard,2024-05-08 09:03,Billing question,Agent Brown,Explained tiered rates and provided rate sheet
+CL0056,RC1126,Matthew Bryant,2024-05-08 09:49,High usage inquiry,Agent Wang,Verified meter read and suggested leak check
+CL0057,RC1127,Aria Sanders,2024-05-08 10:23,Service stop request,Agent Smith,Scheduled service stop for 2024-05-18
+CL0058,RC1128,David Coleman,2024-05-08 11:05,General info,Agent Lee,Provided hours and contact channels for city services
+CL0059,RC1129,Penelope Ramirez,2024-05-08 13:17,Payment arrangement,Agent Patel,Set up 3-month payment plan with due dates
+CL0060,RC1130,Joseph Barnes,2024-05-08 14:02,Streetlight outage,Agent Garcia,Opened work order and confirmed pole number
+CL0061,RC1131,Nora Powell,2024-05-09 09:10,Outage report,Agent Brown,Confirmed area outage and sent SMS updates enrollment info
+CL0062,RC1132,Wyatt Long,2024-05-09 09:55,Billing question,Agent Wang,Reviewed charges and explained adjustment process
+CL0063,RC1133,Stella Perry,2024-05-09 10:34,Update contact info,Agent Smith,Updated email address and notification preferences
+CL0064,RC1134,Levi Simmons,2024-05-09 11:18,Solar program inquiry,Agent Lee,Provided contractor list disclaimer and program guidelines
+CL0065,RC1135,Audrey Foster,2024-05-09 13:06,Service start request,Agent Patel,Scheduled start for 2024-05-12
+CL0066,RC1136,Isaac Coleman,2024-05-09 14:29,Complaint,Agent Garcia,Logged complaint and provided case number
+CL0067,RC1137,Claire Russell,2024-05-10 08:46,High usage inquiry,Agent Brown,Shared comparison to last year and weather impact notes
+CL0068,RC1138,Owen Griffin,2024-05-10 09:27,Payment arrangement,Agent Wang,Set up automatic payment plan enrollment
+CL0069,RC1139,Scarlett Hayes,2024-05-10 10:05,Billing question,Agent Smith,Explained deposit requirement and refund conditions
+CL0070,RC1140,Julian Gonzales,2024-05-10 10:58,Energy efficiency tips,Agent Lee,Provided rebate info for efficient HVAC upgrades
+CL0071,RC1141,Ellie Fisher,2024-05-10 13:11,Streetlight outage,Agent Patel,Submitted repair request and confirmed location details
+CL0072,RC1142,Caleb Butler,2024-05-10 14:40,Service stop request,Agent Garcia,Scheduled stop for 2024-05-20 and confirmed final bill timing
+CL0073,RC1143,Violet Kim,2024-05-11 09:08,General info,Agent Brown,Explained how to submit service requests online
+CL0074,RC1144,Anthony Wright,2024-05-11 09:52,Outage report,Agent Wang,Created outage ticket and advised safety guidance
+CL0075,RC1145,Samantha Green,2024-05-11 10:30,Update contact info,Agent Smith,Updated authorized user on account
+CL0076,RC1146,Christian Scott,2024-05-11 11:14,Billing question,Agent Lee,Explained bill breakdown and verified meter number
+CL0077,RC1147,Lucy Adams,2024-05-11 13:25,Solar program inquiry,Agent Patel,Shared enrollment timeline and required documents
+CL0078,RC1148,Gabriel Baker,2024-05-11 14:07,Payment arrangement,Agent Garcia,Established hardship payment plan pending documentation
+CL0079,RC1149,Madison Nelson,2024-05-12 09:01,High usage inquiry,Agent Brown,Advised monitoring daily usage and offered audit scheduling
+CL0080,RC1150,Dylan Carter,2024-05-12 09:44,Service start request,Agent Wang,Scheduled start for 2024-05-14
+CL0081,RC1151,Hailey Mitchell,2024-05-12 10:19,Complaint,Agent Smith,Escalated to supervisor and confirmed response SLA
+CL0082,RC1152,Thomas Reed,2024-05-12 11:03,Billing question,Agent Lee,Resolved billing discrepancy and confirmed corrected balance
+CL0083,RC1153,Leah Parker,2024-05-12 13:12,Streetlight outage,Agent Patel,Opened ticket and advised typical repair window
+CL0084,RC1154,Aaron Hughes,2024-05-12 14:36,Energy efficiency tips,Agent Garcia,Provided guidance on peak hour usage reduction
+CL0085,RC1155,Ruby Collins,2024-05-13 08:57,Update contact info,Agent Brown,Updated mailing and service address
+CL0086,RC1156,Charles Rivera,2024-05-13 09:33,Outage report,Agent Wang,Logged partial outage and dispatched technician request
+CL0087,RC1157,Naomi Torres,2024-05-13 10:08,Service stop request,Agent Smith,Scheduled stop for 2024-05-22
+CL0088,RC1158,Jeremiah Peterson,2024-05-13 10:51,General info,Agent Lee,Provided information on business account setup
+CL0089,RC1159,Julia Bennett,2024-05-13 13:04,Payment arrangement,Agent Patel,Set up payment plan and confirmed confirmation email sent
+CL0090,RC1160,Kevin Ward,2024-05-13 14:18,Billing question,Agent Garcia,Explained returned payment and next steps to restore status
+CL0091,RC1161,Eliana Brooks,2024-05-14 09:06,Solar program inquiry,Agent Brown,Reviewed incentive amounts and application steps
+CL0092,RC1162,Brandon Price,2024-05-14 09:47,High usage inquiry,Agent Wang,Verified billing period and recommended thermostat settings
+CL0093,RC1163,Maya Russell,2024-05-14 10:26,Service start request,Agent Smith,Scheduled start for 2024-05-16
+CL0094,RC1164,Sean Phillips,2024-05-14 11:11,Complaint,Agent Lee,Logged complaint about repeated outages and escalated for review
+CL0095,RC1165,Anna Flores,2024-05-14 13:09,Update contact info,Agent Patel,Updated phone number and paperless billing preference
+CL0096,RC1166,Peter Sanders,2024-05-14 14:02,Streetlight outage,Agent Garcia,Submitted maintenance request and provided reference number
+CL0097,RC1167,Kylie Gonzales,2024-05-15 09:05,Billing question,Agent Brown,Explained final bill timeline for move-out
+CL0098,RC1168,Adam Fisher,2024-05-15 09:38,Outage report,Agent Wang,Confirmed restoration completed and closed ticket
+CL0099,RC1169,Serena Butler,2024-05-15 10:22,Energy efficiency tips,Agent Smith,Provided tips for summer cooling and rebate links
+CL0100,RC1170,Jason Long,2024-05-15 11:00,General info,Agent Lee,Directed to online portal for forms and service requests

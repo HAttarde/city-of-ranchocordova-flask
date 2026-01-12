@@ -1,0 +1,59 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+s3cmd/
+var/
+wheels/
+pip-wheel-metadata/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+reset_auth.py
+MANIFEST
+*~
+# Virtual environments
+venv/
+env/
+ENV/
+
+# Environment variables
+.env
+.venv
+service_account.json
+credentials.json
+token.json
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# FAISS index (if you don't want to include large binary files)
+faiss_index/
+
+# ChromaDB vector database
+chroma_db/
+src/ranchocordova/chroma_db/
+
+ftb-app.zip

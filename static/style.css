@@ -1,0 +1,165 @@
+body, html {
+    overflow-x: hidden;
+    max-width: 100%;
+}
+
+.container, .main-container {
+    max-width: 100%;
+    overflow-x: hidden;
+}
+/* Navbar styling */
+.navbar-brand {
+    font-size: 1.1rem;
+    color: #111827;
+}
+
+.navbar-brand:hover {
+    color: #1d4ed8;
+    text-decoration: none;
+}
+
+.btn-outline-danger {
+    border-radius: 20px;
+    padding: 4px 14px;
+}
+
+/* Dashboard cards */
+.hover-card {
+    border-radius: 12px;
+    transition: all 0.3s ease-in-out;
+    background-color: #fff;
+    border: 1px solid #d1d9e0 !important; /* Lighter border */
+}
+
+.hover-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 20 24px 28px rgba(0, 0, 0, 0.1); /* Reduced shadow effect */
+}
+
+/* Department icons */
+.dept-icon {
+    height: 100%;
+    width: auto;
+    object-fit: contain;
+    }
+
+.form-control {
+    background: #fff !important;
+    border: 1px solid #d1d9e0 !important; /* Lighter border */
+    color: #222 !important;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.form-control:focus {
+    background: #f8fff8 !important;
+    border-color: #17c964 !important;
+    box-shadow: 0 0 0 0.25rem rgba(23, 201, 100, 0.4) !important; /* green glow */
+    outline: none !important;
+}
+
+
+/*Dashboard fixes*/
+.dashboard-tile {
+    background: #fff;
+    border: 1px solid #dce1e5 !important; /* Lighter border */
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 20px; /* Increased margin for spacing */
+    height: 148px;
+    width: 198px;
+    box-shadow: none;
+    transition: border 0.05s, box-shadow 0.18s;
+}
+
+.dashboard-tile:hover {
+    border: 2px solid #c0e6d0 !important; /* Thicker border, same light color */
+    box-shadow:
+        0 0 20px 10px rgba(23, 201, 100, 0.8), /* Increased outward light glow */
+        0 0 30px 15px rgba(23, 201, 100, 0.6), /* Additional glow layer */
+        0 4px 12px rgba(0, 0, 0, 0.1);       /* Subtle depth shadow */
+    transition: border 0.05s, box-shadow 0.18s;
+}
+
+/* Text colors as shown in PPT */
+.dark-blue-text {
+    color: #034EA2  !important; /* Dark blue color */
+}
+
+.gray-text {
+    color: #4a5568 !important; /* Gray color from PPT */
+}
+
+/* Arrow styling */
+.back-arrow {
+    color: #34C28F !important; /* Darker arrow color */
+    font-size: 30px !important; /* Slightly smaller arrow */
+    margin-left: 10px !important; /* Reduced space */
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+}
+
+/* White background for logo area */
+.logo-container {
+    background-color: white;
+    padding: 5px 12px;
+    border-radius: 8px;
+}
+
+/* Module cards */
+.module-card {
+    transition: transform 0.2s, box-shadow 0.2s;
+    height: 100%;
+    border: none;
+    border-radius: 12px;
+    border: 10px solid #e2e6ea !important; /* Lighter border */
+}
+
+.module-card:hover {
+border: 2px solid #c0e6d0 !important; /* Thicker border, same light color */
+    box-shadow:
+        10px 10px 20px 10px rgba(23, 201, 100, 0.8), /* Increased outward light glow */
+        0 0 30px 15px rgba(23, 201, 100, 0.6), /* Additional glow layer */
+        0 4px 12px rgba(0, 0, 0, 0.1);       /* Subtle depth shadow */
+    transition: border 0.05s, box-shadow 0.18s;
+}
+
+.module-icon {
+    height: 100px !important; /* Slightly larger icons */
+    margin-bottom: 0.5rem;  
+}
+
+.module-name {
+    font-weight: 600;
+    /*font-size: 0.9rem;*/
+}
+
+.light-border {
+    border: 3px solid #e2e6ea !important; /* Lighter border color */
+}
+
+.light-hr {
+    background: #e9ecef !important; /* Lighter horizontal line color */
+    height: 1px; /* Thinner horizontal rule */
+    border: none;
+    margin: 40px auto; /* Center align the hr and add space around it */
+    width: 80%; /* Adjust width as needed, 80% of the container width */
+}
+
+/* Make all cards lighter by default */
+.card {
+    border: 1.5px solid #e2e6ea !important;
+}
+
+/* Lighten horizontal lines globally */
+hr, .light-hr {
+    background: #e9ecef !important;
+    height: 1px;
+    border: none;
+}
+
+a {
+    color: green;
+}

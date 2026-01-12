@@ -1,0 +1,285 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Categories – Enterprise Orchestration Suite</title>
+
+        <!-- Bootstrap + Font-Awesome -->
+        <link
+            href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+            rel="stylesheet"
+        />
+        <link
+            rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+        />
+        <link
+            rel="stylesheet"
+            href="{{ url_for('static', filename='style.css') }}"
+        />
+        <link
+            rel="stylesheet"
+            href="{{ url_for('static', filename='mobile.css') }}"
+        />
+
+        <style>
+            /* ---------- navbar user badge ---------- */
+            .user-badge {
+                display: inline-flex;
+                align-items: center;
+                gap: 0.45rem;
+                cursor: pointer;
+                user-select: none;
+                margin-right: 30px;
+            }
+            .user-letter {
+                width: 32px;
+                height: 32px;
+                background: #e7f5fd;
+                color: #3b6fbb;
+                border-radius: 6px;
+                display: grid;
+                place-content: center;
+                font-weight: 600;
+                border-color: black;
+            }
+            .user-badge i {
+                transition: transform 0.2s;
+            }
+            .user-badge.show i {
+                transform: rotate(180deg);
+            }
+
+            /* ---------- dropdown ---------- */
+            .logout-popover {
+                position: absolute;
+                top: 105%;
+                right: 0;
+                background: #fff;
+                border: 1px solid #dee2e6;
+                border-radius: 8px;
+                box-shadow: 0 4px 14px rgba(0, 0, 0, 0.12);
+                padding: 0.5rem 0.8rem;
+                min-width: 140px;
+                display: none;
+                z-index: 1055;
+            }
+            .logout-popover a {
+                color: #dc3545;
+                text-decoration: none;
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
+            }
+
+            /* ---------- page title ---------- */
+            .page-title {
+                font-size: 2.3rem;
+                font-weight: 700;
+                letter-spacing: -0.5px;
+                margin-bottom: 4rem;
+            }
+            .page-sub {
+                font-size: 1.1rem;
+                font-weight: 600;
+                color: #6c757d;
+                margin-bottom: 3rem;
+            }
+
+            /* ---------- tiles ---------- */
+            .categories-grid {
+                display: flex;
+                flex-wrap: wrap;
+                justify-content: center;
+                gap: 1.5rem;
+            }
+            .cat-tile {
+                background: #fff;
+                border: 2px solid #9b9ea4;
+                border-radius: 20px;
+                width: 248px;
+                height: 278px;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                text-decoration: none !important;
+                transition:
+                    border 0.05s,
+                    box-shadow 0.18s;
+            }
+            .cat-tile:hover {
+                border-color: #17c964;
+                box-shadow: 0 0 20px 8px rgba(23, 201, 100, 0.55);
+            }
+            .cat-icon {
+                max-width: 90%;
+                max-height: 90%;
+                object-fit: contain;
+                margin-bottom: 0.6rem;
+            }
+            .cat-label {
+                font-size: 1.25rem;
+                font-weight: 600;
+                color: #212529;
+            }
+
+            /* ---------- decorative triangles (shorter) ---------- */
+            .triangle-wrap {
+                position: relative;
+                height: 140px;
+                margin-top: auto; /* keeps footer at bottom */
+                overflow: hidden; /* hide outside edges */
+            }
+
+            .triangle-left,
+            .triangle-right {
+                position: absolute;
+                bottom: 0;
+                height: 100%;
+                width: 100%;
+            }
+
+            /* green – goes LEFT */
+            .triangle-left {
+                background: #57b981;
+                z-index: 2;
+                clip-path: polygon(0 40%, 0 100%, 75% 100%);
+            }
+
+            /* blue – goes RIGHT */
+            .triangle-right {
+                background: #3f72bd;
+                z-index: 1;
+                clip-path: polygon(100% 40%, 100% 100%, 0 100%);
+            }
+
+            /* ---------- plain footer ---------- */
+            footer {
+                background: #fff;
+                padding: 15px 0;
+                text-align: center;
+            }
+            footer small {
+                color: #6c757d;
+                letter-spacing: 0.4px;
+            }
+        </style>
+    </head>
+
+    <script>
+        function toggleLogout() {
+            const box = document.getElementById("logoutBox");
+            box.style.display =
+                box.style.display === "block" ? "none" : "block";
+        }
+        // close if user clicks outside
+        document.addEventListener("click", function (e) {
+            const badge = document.querySelector(".user-badge");
+            const box = document.getElementById("logoutBox");
+            if (!badge.contains(e.target)) box.style.display = "none";
+        });
+    </script>
+
+    <body class="bg-white d-flex flex-column" style="min-height: 100vh">
+        <!-- ================= NAVBAR ================= -->
+        <nav
+            class="navbar navbar-light bg-white shadow-sm sticky-top"
+            style="height: 85px"
+        >
+            <div class="container-fluid h-100 align-items-center">
+                <!-- logo + back -->
+                <div class="d-flex align-items-center">
+                    <a href="{{ url_for('login') }}">
+                        <img
+                            src="{{ url_for('static', filename='llm.png') }}"
+                            alt="Logo"
+                            style="height: 55px"
+                        />
+                    </a>
+                </div>
+
+                <!-- Admin badge + pop-over logout -->
+                <!-- Admin badge + dropdown -->
+                <div class="position-relative">
+                    <div class="user-badge" onclick="toggleLogout()">
+                        <span class="text-dark fw-500">Admin</span>
+                        <i class="fa fa-chevron-down small text-muted"></i>
+                    </div>
+                    <div class="logout-popover" id="logoutBox">
+                        <a href="{{ url_for('logout') }}">
+                            <i class="fa fa-door-open"></i><span>Logout</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <!-- ================= PAGE CONTENT ================= -->
+        <div class="container py-5 flex-grow-1">
+            <h2 class="page-title text-center">
+                Orchestrate Enterprise Workflows with Spalify's Industrial Agent
+            </h2>
+
+            <!-- category tiles (no outer box) -->
+            <div class="categories-grid">
+                <!-- Government -->
+                <a
+                    href="{{ url_for('dashboard', category='public_services') }}"
+                    class="cat-tile"
+                >
+                    <img
+                        src="{{ url_for('static', filename='icons/government.png') }}"
+                        alt="Government"
+                        class="cat-icon"
+                    />
+                    <span class="cat-label">Government</span>
+                </a>
+
+                <!-- Energy -->
+                <a
+                    href="{{ url_for('dashboard', category='energy') }}"
+                    class="cat-tile"
+                >
+                    <img
+                        src="{{ url_for('static', filename='icons/energy_page2.png') }}"
+                        alt="Energy"
+                        class="cat-icon"
+                    />
+                    <span class="cat-label">Energy</span>
+                </a>
+
+                <!-- Health -->
+                <a
+                    href="{{ url_for('dashboard', category='health') }}"
+                    class="cat-tile"
+                >
+                    <img
+                        src="{{ url_for('static', filename='icons/health.png') }}"
+                        alt="Health"
+                        class="cat-icon"
+                    />
+                    <span class="cat-label">Health</span>
+                </a>
+            </div>
+        </div>
+
+        <!-- ---------- triangles above plain footer ---------- -->
+        <div class="triangle-wrap">
+            <div class="triangle-left"></div>
+            <div class="triangle-right"></div>
+        </div>
+
+        <!-- ================= PLAIN FOOTER ================= -->
+        <footer>
+            <small
+                >&copy; 2025 LLM at Scale.AI. All rights reserved. Multi-Agent
+                Orchestration for the Enterprise</small
+            >
+        </footer>
+
+        <!-- Bootstrap JS -->
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    </body>
+</html>

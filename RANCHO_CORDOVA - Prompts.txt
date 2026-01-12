@@ -1,0 +1,42 @@
+
+## AI-Data-2025-R1.csv (Energy Agent)
+What time of day do customers typically use the most electricity?
+Which customer accounts have the highest total energy consumption over the year? Give me the top 5.
+---
+
+## California_Residential_Energy_Benchmarks_Expanded.csv(Energy Agent)
+How do SMUD's electricity rates compare to PG&E? Am I saving money with SMUD?
+What's the average monthly electricity bill for an apartment versus a single-family home in California?
+---
+
+## SMUD_TOU_Rates.csv (Customer Service Agent)
+What are SMUD's peak hours and how much more expensive is electricity during peak times?
+When should I run my dishwasher and washing machine to save the most money on my electric bill?
+---
+
+## SMUD_Rebates.csv (Customer Service Agent)
+I want to replace my old water heater. What rebates does SMUD offer for heat pump water heaters?
+What energy efficiency rebates are available for residential customers? Which program offers the highest rebates?
+---
+
+## 2024AnnualReport_5YearSummary.pdf (Energy Agent)
+What does SMUD's 2024 annual report say about their energy performance and customer satisfaction?
+According to the 5-year summary, how has SMUD's renewable energy percentage changed over time?
+---
+
+## CEC-200-2021-005-PO.pdf (Energy Agent)
+What are California's current efficiency requirements for residential air conditioning systems?
+According to the California appliance study, what percentage of homes have electric water heaters versus gas water heaters?
+---
+
+
+
+Plotting commands:
+
+## Energy Agent
+Show me energy forecast for next 2 weeks
+Show energy trend over time with a graph
+
+## Customer Service Agent
+Show call reasons breakdown
+Show call volume trend

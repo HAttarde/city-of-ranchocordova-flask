@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FTB - Enterprise Orchestration Suite</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}?v=1">
+    <link rel="stylesheet" href="{{ url_for('static', filename='mobile.css') }}?v=1">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<style>
+
+
+/* ---------- navbar user badge ---------- */
+.user-badge{display:inline-flex;align-items:center;gap:.45rem;cursor:pointer;user-select:none;margin-right:30px}
+.user-letter{width:32px;height:32px;background:#e7f5fd;color:#3b6fbb;border-radius:6px;display:grid;place-content:center;font-weight:600;border-color:black;}
+.user-badge i{transition:transform .2s}
+.user-badge.show i{transform:rotate(180deg)}
+
+/* ---------- dropdown ---------- */
+.logout-popover{position:absolute;top:105%;right:0;background:#fff;border:1px solid #dee2e6;border-radius:8px;box-shadow:0 4px 14px rgba(0,0,0,.12);padding:.5rem .8rem;min-width:140px;display:none;z-index:1055}
+.logout-popover a{color:#dc3545;text-decoration:none;display:flex;align-items:center;gap:.5rem}
+
+/* ---------- page title ---------- */
+.page-title{font-size:2.3rem;font-weight:700;letter-spacing:-.5px;margin-bottom:4rem}
+.page-sub{font-size:1.1rem;font-weight:600;color:#6c757d;margin-bottom:3rem}
+
+/* ---------- tiles ---------- */
+.categories-grid{display:flex;flex-wrap:wrap;justify-content:center;gap:1.5rem}
+.cat-tile{background:#fff;border:2px solid #9b9ea4;border-radius:20px;width:248px;height:278px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-decoration:none !important;transition:border .05s,box-shadow .18s}
+.cat-tile:hover{border-color:#17c964;box-shadow:0 0 20px 8px rgba(23,201,100,.55)}
+.cat-icon{max-width:90%;max-height:90%;object-fit:contain;margin-bottom:.6rem}
+.cat-label{font-size:1.25rem;font-weight:600;color:#212529}
+
+/* ---------- decorative triangles (shorter) ---------- */
+.triangle-wrap{
+    position: relative;
+    height: 140px;
+    margin-top: auto;          /* keeps footer at bottom */
+    overflow: hidden;          /* hide outside edges */
+}
+
+.triangle-left,
+.triangle-right{
+    position: absolute;
+    bottom: 0;
+    height: 100%;
+    width: 100%;
+}
+
+/* green – goes LEFT */
+.triangle-left{
+    background: #57b981;
+    z-index: 2;
+    clip-path: polygon(0 40%, 0 100%, 75% 100%);
+}
+
+/* blue – goes RIGHT */
+.triangle-right{
+    background: #3f72bd;
+    z-index: 1;
+    clip-path: polygon(100% 40%, 100% 100%, 0 100%);
+}
+
+/* ---------- pull box downward so it OVERLAPS triangles ---------- */
+.dashboard-container {
+    position: relative;          /* raise it above triangles */
+    z-index: 10;                 /* higher than triangles (z-index 2 / 1) */
+    margin-bottom: -70px;        /* <<<  same height as .triangle-wrap  */
+}
+/* ---- kill bottom padding of THIS page’s container ---- */
+body.dashboard-page .container { padding-bottom: 0 !important; }
+/* ---------- "< Back" link ---------- */
+.back-link {
+    position: absolute;
+    top: 100%;                   /* sits right under the logo */
+    left: 0;
+    font-size: 0.9rem;
+    color: #000 !important;
+    text-decoration: none;
+    margin-top: 4px;
+    margin-left: 25px;
+}
+.back-link:hover { color: #3b6fbb !important; }
+
+/* ---------- plain footer ---------- */
+footer{background:#fff;padding:15px 0;text-align:center}
+footer small{color:#6c757d;letter-spacing:.4px}
+</style>
+
+</head>
+
+<script>
+  function toggleLogout(){
+    const box=document.getElementById('logoutBox');
+    box.style.display=box.style.display==='block'?'none':'block';
+  }
+  // close if user clicks outside
+  document.addEventListener('click',function(e){
+    const badge=document.querySelector('.user-badge');
+    const box=document.getElementById('logoutBox');
+    if(!badge.contains(e.target)) box.style.display='none';
+  });
+</script>
+
+
+<body class="bg-white">
+
+<!-- Navbar with white background for logo -->
+<nav class="navbar navbar-light bg-white shadow-sm sticky-top" style="height:85px">
+    <div class="container-fluid h-100 align-items-center">
+
+        <!-- logo + back -->
+        <div class="d-flex align-items-center">
+            <a href="{{ url_for('login') }}">
+                <img src="{{ url_for('static', filename='llm.png') }}" alt="Logo" style="height:55px">
+            </a>
+        </div>
+
+        <!-- Admin badge + dropdown -->
+        <div class="position-relative">
+          <div class="user-badge" onclick="toggleLogout()">
+            <span class="text-dark fw-500">Admin</span>
+            <i class="fa fa-chevron-down small text-muted"></i>
+          </div>
+          <div class="logout-popover" id="logoutBox">
+            <a href="{{ url_for('logout') }}">
+              <i class="fa fa-door-open"></i><span>Logout</span>
+            </a>
+          </div>
+        </div>
+
+    </div>
+</nav>
+
+
+<!-- Page Content -->
+<div class="container py-5">
+    <div class="text-center">
+        <img src="{{ url_for('static', filename='icons/' + company_icon) }}" alt="Company Logo" class="company-logo" style="width:15%;height:15%;">
+    </div>
+
+    <h2 class="text-center modules-title" style="font-size:2.3rem; font-weight:700; margin-top: 25px; margin-bottom:35px; letter-spacing: -0.5px;">
+        Enterprise Orchestration Suite
+    </h2>
+
+    <!-- Main container with popup support -->
+    <div class="light-border dashboard-container" style="
+    border: 5px solid #ccd0d2;
+        border-radius: 10px;
+        background: #f2f2f2bd;
+        padding: 25px 50px;
+        margin: 0 auto;
+        width: 920px;
+        display: block;"
+    >
+        <!-- Module Grid -->
+        <div class="modules-grid">
+            <!-- Enterprise QA - routes to agent catalog -->
+            <div class="module-item dashboard-tile">
+                <a href="{{ url_for('agent_catalog', cat=category, dept=dept, dept_display=dept_display) }}" class="text-decoration-none">
+                    <div class="card module-card text-center">
+                        <div class="card-body d-flex flex-column align-items-center justify-content-center">
+                            <img src="{{ url_for('static', filename='icons/qa.png') }}"
+                                 alt="Enterprise QA" class="module-icon">
+                            <h5 class="module-name">Enterprise Q&A</h5>
+                        </div>
+                    </div>
+                </a>
+            </div>
+
+            <!-- Other modules -->
+            {% set other_modules = [
+                {"name": "Workflow", "icon": "workflow.png", "route": "oops"},
+                {"name": "Transaction", "icon": "transaction.png", "route": "oops"},
+                {"name": "Insights", "icon": "insights.png", "route": "insights"},
+                {"name": "Data Management", "icon": "datamanagement.png", "route": "oops"},
+                {"name": "Voice Agent", "icon": "voiceagent.png", "route": "voice_agent"}
+            ] %}
+
+{% for module in other_modules %}
+<div class="module-item dashboard-tile">
+    {% if module.route.startswith('http') %}
+        <a href="{{ module.route }}" target="_blank" class="text-decoration-none">
+    {% elif module.route == 'insights' %}
+        <a href="{{ url_for(module.route, cat=category, dept=dept, dept_display=dept_display) }}" class="text-decoration-none">
+    {% elif module.route == 'voice_agent' %}
+        <a href="{{ url_for('voice_agent', cat=category, dept=dept, dept_display=dept_display) }}" class="text-decoration-none">
+    {% else %}
+        <a href="{{ url_for(module.route) }}" class="text-decoration-none">
+    {% endif %}
+        <div class="card module-card text-center">
+            <div class="card-body d-flex flex-column align-items-center justify-content-center">
+                <img src="{{ url_for('static', filename='icons/' + module.icon) }}"
+                     alt="{{ module.name }}" class="module-icon">
+                <h5 class="module-name">{{ module.name }}</h5>
+            </div>
+        </div>
+    </a>
+</div>
+{% endfor %}
+
+    </div>
+</div>
+
+
+<!-- ---------- triangles above plain footer ---------- -->
+<div class="triangle-wrap">
+    <div class="triangle-left"></div>
+    <div class="triangle-right"></div>
+</div>
+
+<!-- ================= PLAIN FOOTER ================= -->
+<footer>
+    <small>&copy; 2025 LLM at Scale.AI. All rights reserved. Multi-Agent Orchestration for the Enterprise</small>
+</footer>
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+
+</body>
+</html>

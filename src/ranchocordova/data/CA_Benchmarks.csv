@@ -1,0 +1,37 @@
+Utility_or_CCA,Utility_Type,Home_Type,Avg_Home_Size_sqft,Avg_Monthly_Usage_kWh,Avg_Annual_Usage_kWh,EUI_kWh_per_sqft_yr,Avg_Rate_usd_per_kWh,Est_Avg_Monthly_Bill_usd
+PG&E,IOU,Apartment,800,350,4200,5.25,0.38,133
+PG&E,IOU,Condo/Townhome,1200,450,5400,4.5,0.38,171
+PG&E,IOU,Single-Family,1800,550,6600,3.67,0.38,209
+SCE,IOU,Apartment,850,450,5400,6.35,0.36,162
+SCE,IOU,Condo/Townhome,1300,600,7200,5.54,0.36,216
+SCE,IOU,Single-Family,2000,750,9000,4.5,0.36,270
+SDG&E,IOU,Apartment,850,425,5100,6,0.41,174
+SDG&E,IOU,Condo/Townhome,1300,575,6900,5.31,0.41,236
+SDG&E,IOU,Single-Family,2000,725,8700,4.35,0.41,297
+MCE,CCA (PG&E area),Apartment,800,340,4080,5.1,0.34,116
+MCE,CCA (PG&E area),Condo/Townhome,1200,440,5280,4.4,0.34,150
+MCE,CCA (PG&E area),Single-Family,1800,540,6480,3.6,0.34,184
+Peninsula Clean Energy,CCA (PG&E area),Apartment,800,335,4020,5.03,0.33,111
+Peninsula Clean Energy,CCA (PG&E area),Condo/Townhome,1200,435,5220,4.35,0.33,144
+Peninsula Clean Energy,CCA (PG&E area),Single-Family,1800,535,6420,3.57,0.33,177
+Silicon Valley Clean Energy,CCA (PG&E area),Apartment,800,345,4140,5.18,0.32,110
+Silicon Valley Clean Energy,CCA (PG&E area),Condo/Townhome,1200,445,5340,4.45,0.32,142
+Silicon Valley Clean Energy,CCA (PG&E area),Single-Family,1800,545,6540,3.63,0.32,174
+Clean Power Alliance,CCA (SCE area),Apartment,850,445,5340,6.28,0.34,151
+Clean Power Alliance,CCA (SCE area),Condo/Townhome,1300,595,7140,5.49,0.34,202
+Clean Power Alliance,CCA (SCE area),Single-Family,2000,745,8940,4.47,0.34,253
+San Diego Community Power,CCA (SDG&E area),Apartment,850,420,5040,5.93,0.38,160
+San Diego Community Power,CCA (SDG&E area),Condo/Townhome,1300,570,6840,5.26,0.38,217
+San Diego Community Power,CCA (SDG&E area),Single-Family,2000,720,8640,4.32,0.38,274
+SMUD,Municipal,Apartment,900,500,6000,6.67,0.17,85
+SMUD,Municipal,Condo/Townhome,1400,650,7800,5.57,0.17,111
+SMUD,Municipal,Single-Family,2000,750,9000,4.5,0.17,128
+LADWP,Municipal,Apartment,800,400,4800,6,0.23,92
+LADWP,Municipal,Condo/Townhome,1200,500,6000,5,0.23,115
+LADWP,Municipal,Single-Family,1800,600,7200,4,0.23,138
+Alameda Municipal Power,Municipal,Apartment,800,360,4320,5.4,0.21,76
+Alameda Municipal Power,Municipal,Condo/Townhome,1200,460,5520,4.6,0.21,97
+Alameda Municipal Power,Municipal,Single-Family,1800,560,6720,3.73,0.21,118
+Roseville Electric,Municipal,Apartment,900,480,5760,6.4,0.16,77
+Roseville Electric,Municipal,Condo/Townhome,1400,620,7440,5.31,0.16,99
+Roseville Electric,Municipal,Single-Family,2000,720,8640,4.32,0.16,115

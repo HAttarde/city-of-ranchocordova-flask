@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login – Multi-Agent Orchestration</title>
+
+    <!-- Bootstrap + your original sheets -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='mobile.css') }}">
+
+    <style>
+        /* --------- layout helpers --------- */
+        html,body{height:100%}
+        .split-row{min-height:100vh;display:flex;align-items:stretch}
+        .left-pane{display:flex;flex-direction:column;justify-content:center;align-items:center;position:relative}
+        .right-pane{background:#f8f9fa;display:flex;align-items:center;justify-content:center;color:#fff}
+        .logo-tl{position:absolute;top:2rem;left:2rem;width:140px}
+        .amico-ctr{width:280px}
+
+        /* make the card sit nicely inside the blue half */
+        .login-card{max-width:420px;width:100%;border:none;border-radius:1.1rem}
+    </style>
+</head>
+<body>
+
+<div class="row g-0 split-row">
+    <!-- ========== LEFT HALF ========== -->
+    <div class="col-md-6 left-pane"
+         style="background:url('{{ url_for('static', filename='Rectangle FTB login.png') }}') center/cover no-repeat;
+                position:relative">
+
+      <div class="d-flex flex-column justify-content-center align-items-center h-100"
+           style="position:relative; z-index:2">
+        <h1 class="text-white fw-bold text-center px-4"
+            style="font-size:2.2rem; letter-spacing:.5px">
+          Welcome to City of Rancho Cordova
+        </h1>
+        <br>
+        <h1 class="text-white fw-bold text-center px-4"
+            style="font-size:1.1rem; letter-spacing:.5px">
+             Multi-Agent Orchestration for Energy and Customer Service
+        </h1>
+      </div>
+    </div>
+
+    <!-- ========== RIGHT HALF (white, no card box) ========== -->
+    <div class="col-md-6 right-pane d-flex flex-column bg-white px-5 py-4">
+
+      <!-- 1. logo top-left -->
+      <img src="{{ url_for('static', filename='ranchocordova.jpeg') }}"
+           alt="LLMAtScale logo" style="width:190px; align-self:flex-start">
+
+      <!-- 2. vertical spacer -->
+      <div class="flex-fill d-flex align-items-center justify-content-center w-100">
+        <div class="w-100" style="max-width:420px;height:515px">
+
+          <h4 class="fw-bold mb-3" style="color:black;text-align: center;padding-bottom: 25px;">Login to the account</h4>
+
+          {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+              {% for category, msg in messages %}
+                <div class="alert alert-{{ category }} alert-sm">{{ msg }}</div>
+              {% endfor %}
+            {% endif %}
+          {% endwith %}
+
+          <!-- 3. form -->
+          <form method="POST" class="mb-3">
+            <div class="mb-3" style="font-size:x-large">
+              <label for="username" class="form-label small text-muted mb-1"><strong>Username</strong></label>
+              <input type="text" class="form-control form-control-lg" id="username"
+                     name="username" placeholder="Enter username" required autofocus>
+            </div>
+
+            <div class="mb-3" style="font-size:x-large">
+              <label for="password" class="form-label small text-muted mb-1"><strong>Password</strong></label>
+              <input type="password" class="form-control form-control-lg" id="password"
+                     name="password" placeholder="Enter password" required>
+            </div>
+
+            <!-- forgot link -->
+            <div class="text-end mb-3">
+              <a href="#" class="small text-decoration-none">Forgot password?</a>
+            </div>
+
+            <!-- login button (logo-green) -->
+            <button type="submit" class="btn w-100 fw-semibold text-white mb-3"
+                    style="background:#10B981; border-radius:6px">Login</button>
+          </form>
+
+          <!-- 4. checkboxes -->
+          <div class="form-check mb-2">
+            <input class="form-check-input" type="checkbox" id="guardrails" checked>
+            <label class="form-check-label small" for="guardrails" style="color: black;">Enable guardrails</label>
+          </div>
+          <div class="form-check">
+            <input class="form-check-input" type="checkbox" id="roll-level-security" checked>
+            <label class="form-check-label small" for="roll-level-security" style="color: black;">Enable role level security</label>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+</body>
+</html>

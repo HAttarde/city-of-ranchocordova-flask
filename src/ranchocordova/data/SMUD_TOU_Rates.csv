@@ -1,0 +1,10 @@
+plan,season,start_date,end_date,day_type,period,start_time,end_time,rate_per_kwh_usd
+Time-of-Day (5-8 p.m.),Non-summer,Oct 1,Dec 31,Weekday (Mon-Fri),Off-Peak,00:00,17:00,0.1248
+Time-of-Day (5-8 p.m.),Non-summer,Oct 1,Dec 31,Weekday (Mon-Fri),Peak,17:00,20:00,0.1724
+Time-of-Day (5-8 p.m.),Non-summer,Oct 1,Dec 31,Weekday (Mon-Fri),Off-Peak,20:00,24:00,0.1248
+Time-of-Day (5-8 p.m.),Non-summer,Oct 1,Dec 31,Weekend/Holiday,Off-Peak,00:00,24:00,0.1248
+Time-of-Day (5-8 p.m.),Summer,Jun 1,Sep 30,Weekday (Mon-Fri),Off-Peak,00:00,12:00,0.1505
+Time-of-Day (5-8 p.m.),Summer,Jun 1,Sep 30,Weekday (Mon-Fri),Mid-Peak,12:00,17:00,0.2077
+Time-of-Day (5-8 p.m.),Summer,Jun 1,Sep 30,Weekday (Mon-Fri),Peak,17:00,20:00,0.3655
+Time-of-Day (5-8 p.m.),Summer,Jun 1,Sep 30,Weekday (Mon-Fri),Mid-Peak,20:00,24:00,0.2077
+Time-of-Day (5-8 p.m.),Summer,Jun 1,Sep 30,Weekend/Holiday,Off-Peak,00:00,24:00,0.1505

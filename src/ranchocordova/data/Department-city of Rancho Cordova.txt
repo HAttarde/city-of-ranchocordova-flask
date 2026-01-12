@@ -1,0 +1,11 @@
+Department ID,Department Name,Business Unit/Function,Manager Name,Contact Email,Phone Number,Location
+1,City Manager's Office,Executive Leadership,Sarah Kim,skim@cityofrc.gov,916-123-1001,City Hall Suite 101
+2,Finance,Budget & Payroll,John Perez,jperez@cityofrc.gov,916-123-1002,City Hall Suite 202
+3,Public Works,Streets & Infrastructure,Mark Lee,mlee@cityofrc.gov,916-123-1003,123 Main St
+4,Community Development,Permitting & Planning,Lisa Choi,lchoi@cityofrc.gov,916-123-1004,456 Center Ave
+5,Parks & Recreation,Park Maintenance,Brenda Smith,bsmith@cityofrc.gov,916-123-1005,789 Oak Lane
+6,Human Resources,Recruitment & Employee Relations,Kevin Tran,ktran@cityofrc.gov,916-123-1006,City Hall Suite 303
+7,Police Services,Public Safety,Michael Harris,mharris@rcpd.ca.gov,916-123-1007,100 Police Plaza
+8,IT,Technical Support,Priya Patel,ppatel@cityofrc.gov,916-123-1008,City Hall Suite 404
+9,Economic Development,Business Outreach & Grants,Tom Garcia,tgarcia@cityofrc.gov,916-123-1009,222 Market St
+10,City Clerk,Records Management & Public Meetings,Nicole Martinez,nmartinez@cityofrc.gov,916-123-1010,City Hall Suite 105

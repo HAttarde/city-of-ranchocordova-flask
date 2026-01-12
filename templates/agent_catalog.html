@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agent Catalog - Enterprise Orchestration Suite</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}?v=1">
+    <link rel="stylesheet" href="{{ url_for('static', filename='mobile.css') }}?v=1">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<style>
+/* ---------- navbar user badge ---------- */
+.user-badge{display:inline-flex;align-items:center;gap:.45rem;cursor:pointer;user-select:none;margin-right:30px}
+.user-letter{width:32px;height:32px;background:#e7f5fd;color:#3b6fbb;border-radius:6px;display:grid;place-content:center;font-weight:600;border-color:black;}
+.user-badge i{transition:transform .2s}
+.user-badge.show i{transform:rotate(180deg)}
+
+/* ---------- dropdown ---------- */
+.logout-popover{position:absolute;top:105%;right:0;background:#fff;border:1px solid #dee2e6;border-radius:8px;box-shadow:0 4px 14px rgba(0,0,0,.12);padding:.5rem .8rem;min-width:140px;display:none;z-index:1055}
+.logout-popover a{color:#dc3545;text-decoration:none;display:flex;align-items:center;gap:.5rem}
+
+/* ---------- page title ---------- */
+.page-title{font-size:2.3rem;font-weight:700;letter-spacing:-.5px;margin-bottom:4rem}
+.page-sub{font-size:1.1rem;font-weight:600;color:#6c757d;margin-bottom:3rem}
+
+/* ---------- decorative triangles (shorter) ---------- */
+.triangle-wrap{
+    position: relative;
+    height: 140px;
+    margin-top: auto;
+    overflow: hidden;
+}
+
+.triangle-left,
+.triangle-right{
+    position: absolute;
+    bottom: 0;
+    height: 100%;
+    width: 100%;
+}
+
+.triangle-left{
+    background: #57b981;
+    z-index: 2;
+    clip-path: polygon(0 40%, 0 100%, 75% 100%);
+}
+
+.triangle-right{
+    background: #3f72bd;
+    z-index: 1;
+    clip-path: polygon(100% 40%, 100% 100%, 0 100%);
+}
+
+/* ---------- pull box downward so it OVERLAPS triangles ---------- */
+.dashboard-container {
+    position: relative;
+    z-index: 10;
+    margin-bottom: -70px;
+}
+
+body.dashboard-page .container { padding-bottom: 0 !important; }
+
+/* ---------- "< Back" link ---------- */
+.back-link {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    font-size: 0.9rem;
+    color: #000 !important;
+    text-decoration: none;
+    margin-top: 4px;
+    margin-left: 25px;
+}
+.back-link:hover { color: #3b6fbb !important; }
+
+/* ---------- plain footer ---------- */
+footer{background:#fff;padding:15px 0;text-align:center}
+footer small{color:#6c757d;letter-spacing:.4px}
+
+/* ---------- 2 ROWS OF 4 TILES ---------- */
+.agent-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+}
+
+.agent-row {
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+}
+
+.agent-tile {
+    background: #fff;
+    border: 1px solid #9b9ea4;
+    border-radius: 20px;
+    width: 220px;
+    height: 180px;
+    display: flex;
+    text-align: center;
+    align-items: center;
+    flex-direction: column;
+    justify-content: center;
+    text-decoration: none !important;
+    transition: border .05s, box-shadow .18s;
+    padding: 15px;
+}
+
+.agent-tile:hover {
+    border-color: #17c964;
+    box-shadow: 0 0 20px 8px rgba(23,201,100,.55);
+}
+
+.agent-name {
+    font-size: 1.01rem;
+    font-weight: 600;
+    color: #212529;
+    margin: 0;
+    text-align: center;
+    line-height: 1.4;
+}
+
+.agent-icon{
+  width: 56px;
+  height: 56px;
+  object-fit: contain;
+  margin-bottom: .75rem;
+}
+
+</style>
+
+</head>
+
+<script>
+  function toggleLogout(){
+    const box=document.getElementById('logoutBox');
+    box.style.display=box.style.display==='block'?'none':'block';
+  }
+  document.addEventListener('click',function(e){
+    const badge=document.querySelector('.user-badge');
+    const box=document.getElementById('logoutBox');
+    if(!badge.contains(e.target)) box.style.display='none';
+  });
+</script>
+
+
+<body class="bg-white">
+
+<!-- Navbar -->
+<nav class="navbar navbar-light bg-white shadow-sm sticky-top" style="height:85px">
+    <div class="container-fluid h-100 align-items-center">
+        <div class="d-flex align-items-center">
+            <a href="{{ url_for('login') }}">
+                <img src="{{ url_for('static', filename='ranchocordova.jpeg') }}" alt="Logo" style="height:55px">
+            </a>
+        </div>
+
+        <div class="position-relative">
+            <div class="user-badge" onclick="toggleLogout()">
+                <span class="text-dark fw-500">Admin</span>
+                <i class="fa fa-chevron-down small text-muted"></i>
+            </div>
+            <div class="logout-popover" id="logoutBox">
+                <a href="{{ url_for('logout') }}">
+                    <i class="fa fa-door-open"></i><span>Logout</span>
+                </a>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<!-- Page Content -->
+<div class="container py-5">
+    <h2 class="page-title text-center">
+        Welcome to City of Rancho Cordova
+    </h2>
+
+    <!-- Main container -->
+    <div class="dashboard-container" style="
+        border: 2px solid #ccd0d2;
+        border-radius: 10px;
+        background: #f2f2f2bd;
+        padding: 50px;
+        margin: 90px auto;
+        width: 1100px;
+        max-width: 95%;"
+    >
+        {% if dept == 'ranchocordova' %}
+            <!-- Rancho Cordova Agents (2 agents only) -->
+            <div class="agent-grid">
+                <div class="agent-row">
+                    {% set rancho_agents = [
+                        {"name":"Energy Efficiency<br>Agent", "route":"rancho_energy", "icon":"energy_page2.png"},
+                        {"name":"Customer Service<br>Agent", "route":"rancho_customer_service", "icon":"operations.png"}
+                    ] %}
+                    {% for ag in rancho_agents %}
+                        <a href="{{ url_for(ag.route, cat=category, dept=dept, dept_display='City of Rancho Cordova') }}" class="agent-tile">
+                            <img src="{{ url_for('static', filename='icons/'~ag.icon) }}" alt="" class="agent-icon">
+                            <h5 class="agent-name">{{ ag.name | safe }}</h5>
+                        </a>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- trying to put the data source inside the box-->
+            <div class="text-center mt-5">
+                <small style="color:#6c757d; letter-spacing:.4px;">
+                    <strong>Data Source</strong><br>
+
+                    <a href="https://www.cityofranchocordova.org/"
+                       target="_blank"
+                       style="color:#6c757d; text-decoration:none;">
+                        https://www.cityofranchocordova.org/
+                    </a>
+                    <br>
+
+                    <a href="https://data-ranchocordova.opendata.arcgis.com/"
+                       target="_blank"
+                       style="color:#6c757d; text-decoration:none;">
+                        https://data-ranchocordova.opendata.arcgis.com/
+                    </a>
+                    <br>
+
+                    <a href="https://www.smud.org/"
+                       target="_blank"
+                       style="color:#6c757d; text-decoration:none;">
+                           https://www.smud.org/
+                    </a>
+                    <br>
+
+                    <a href="https://pgedataportals.pge.com/"
+                       target="_blank"
+                       style="color:#6c757d; text-decoration:none;">
+                           https://pgedataportals.pge.com/
+                    </a>
+                    <br>
+                </small>
+            </div>
+
+        {% else %}
+            <!-- FTB Agents (8 agents in 2 rows) -->
+            <div class="agent-grid">
+                <!-- ROW 1 -->
+                <div class="agent-row">
+                    {% set row1 = [
+                        {"name":"Enterprise Q&A:<br>PMO Agent",         "route":"qa_projects",     "icon":"pmo.png"},
+                        {"name":"Enterprise Q&A:<br>Operational Agent", "route":"qa_operations",   "icon":"operations.png"},
+                        {"name":"Refund & Filing<br>Assistant",         "route":"oops",            "icon":"refund.png"},
+                        {"name":"Notice Explainer &<br>Resolution Agent","route":"oops",           "icon":"notice.png"}
+                    ] %}
+                    {% for ag in row1 %}
+                        <a href="{% if ag.route in ['qa_projects','qa_operations'] %}
+                                    {{ url_for(ag.route, cat=category, dept=dept, dept_display=dept_display) }}
+                                {% else %}
+                                    {{ url_for(ag.route) }}
+                                {% endif %}" class="agent-tile">
+                            <img src="{{ url_for('static', filename='icons/'~ag.icon) }}" alt="" class="agent-icon">
+                            <h5 class="agent-name">{{ ag.name | safe }}</h5>
+                        </a>
+                    {% endfor %}
+                </div>
+
+                <!-- ROW 2 -->
+                <div class="agent-row">
+                    {% set row2 = [
+                        {"name":"Payment Plan &<br>Collections Agent",        "route":"oops", "icon":"payment.png"},
+                        {"name":"Identity Verification &<br>Fraud Triage Agent","route":"oops","icon":"identity.png"},
+                        {"name":"Correspondence Intake,<br>Summarization & Routing","route":"oops","icon":"correspondence.png"},
+                        {"name":"Case Dossier &<br>Audit Prep Agent",          "route":"oops", "icon":"audit.png"}
+                    ] %}
+                    {% for ag in row2 %}
+                        <a href="{% if ag.route in ['qa_projects','qa_operations'] %}
+                                    {{ url_for(ag.route, cat=category, dept=dept, dept_display=dept_display) }}
+                                {% else %}
+                                    {{ url_for(ag.route) }}
+                                {% endif %}" class="agent-tile">
+                            <img src="{{ url_for('static', filename='icons/'~ag.icon) }}" alt="" class="agent-icon">
+                            <h5 class="agent-name">{{ ag.name | safe }}</h5>
+                        </a>
+                    {% endfor %}
+                </div>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Triangles -->
+<div class="triangle-wrap">
+    <div class="triangle-left"></div>
+    <div class="triangle-right"></div>
+</div>
+
+<!-- Footer -->
+<footer>
+    <small>&copy; 2025 City of Rancho Cordova. All rights reserved. Multi-Agent Orchestration for the Enterprise</small>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+</body>
+</html>
