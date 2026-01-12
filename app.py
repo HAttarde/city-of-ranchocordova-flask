@@ -16,6 +16,7 @@ import torch
 from dotenv import load_dotenv
 from flask import (
     Flask,
+    Response,
     flash,
     jsonify,
     make_response,
@@ -54,7 +55,7 @@ from document_processors.specific_folder_reader import (
     OperationsDocumentProcessor,
     ProjectDocumentProcessor,
 )
-from src.ranchocordova.chatbot_unified import _llm, generate_answer, initialize_models
+from src.ranchocordova.chatbot_unified import _llm, generate_answer, generate_response_streaming, initialize_models
 
 print("🔥 Warming models at startup")
 src.ranchocordova.chatbot_unified.initialize_models()
@@ -493,6 +494,39 @@ def rancho_agent_api():
             }
         ), 500
 
+
+@app.route("/rancho_agent_api_stream", methods=["POST"])
+@login_required
+def rancho_agent_api_stream():
+    """
+    Streaming API endpoint for Rancho Cordova chatbots.
+    Uses Server-Sent Events (SSE) to stream tokens in real-time.
+    """
+    data = request.json
+    query = data.get("query", "")
+    agent_type = data.get("agent_type", "")
+
+    if not query or not query.strip():
+        return jsonify({"error": "Please provide a valid question."}), 400
+
+    def generate():
+        try:
+            for token in generate_response_streaming(query, use_rag=True, agent_type=agent_type):
+                # Send each token as a Server-Sent Event
+                yield f"data: {token}\n\n"
+            # Signal completion
+            yield "data: [DONE]\n\n"
+        except Exception as e:
+            yield f"data: [ERROR] {str(e)}\n\n"
+
+    return Response(
+        generate(),
+        mimetype="text/event-stream",
+        headers={
+            "Cache-Control": "no-cache",
+            "X-Accel-Buffering": "no",
+        }
+    )
 
 def extract_and_format_table(response_text):
     """Extract table data from response text and format as HTML"""

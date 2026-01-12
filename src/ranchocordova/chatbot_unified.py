@@ -43,7 +43,7 @@ def initialize_models():
     if _llm is not None:
         return
 
-    MODEL_NAME = "HuggingFaceTB/SmolLM-135M-Instruct"  # Smallest model for fast CPU inference
+    MODEL_NAME = "Qwen/Qwen2.5-0.5B-Instruct"
     print("Loading Rancho Cordova models with ChromaDB support...")
 
     tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME)
@@ -485,6 +485,7 @@ def detect_agent_type(prompt: str) -> str:
 def generate_response(prompt: str, use_rag: bool = True, agent_type: str = None) -> str:
     """
     Generate chatbot response with optional RAG and agent routing.
+    Optimized for fast, accurate, well-formatted responses.
 
     Args:
         prompt: User's question or request
@@ -536,16 +537,21 @@ def generate_response(prompt: str, use_rag: bool = True, agent_type: str = None)
 
     # Build the full prompt
     if context:
-        full_prompt = (
-            f"{system_msg}\n\nContext:\n{context}\n\nQuestion: {prompt}\n\nAnswer:"
-        )
-    else:
-        full_prompt = f"{system_msg}\n\nQuestion: {prompt}\n\nAnswer:"
+        user_prompt = f"""Using the following information:
+{context}
 
-    # Generate response
+Question: {prompt}
+
+Answer:"""
+    else:
+        user_prompt = f"""Question: {prompt}
+
+Answer:"""
+
+    # Generate response with optimized parameters
     messages = [
         {"role": "system", "content": system_msg},
-        {"role": "user", "content": full_prompt},
+        {"role": "user", "content": user_prompt},
     ]
 
     text = tokenizer.apply_chat_template(
@@ -557,18 +563,112 @@ def generate_response(prompt: str, use_rag: bool = True, agent_type: str = None)
     with torch.no_grad():
         generated_ids = model.generate(
             **model_inputs,
-            max_new_tokens=128,  # Reduced from 512 for faster responses
-            do_sample=False,  # Greedy decoding (faster)
+            max_new_tokens=512,
+            temperature=0.7,
+            top_p=0.9,
+            do_sample=False,
         )
 
     generated_ids = [
-        output_ids[len(input_ids) :]
+        output_ids[len(input_ids):]
         for input_ids, output_ids in zip(model_inputs.input_ids, generated_ids)
     ]
 
     response = tokenizer.batch_decode(generated_ids, skip_special_tokens=True)[0]
 
     return response.strip()
+
+
+def generate_response_streaming(prompt: str, use_rag: bool = True, agent_type: str = None):
+    """
+    Generate chatbot response with streaming (yields tokens as they're generated).
+    Use this for real-time UI updates.
+
+    Args:
+        prompt: User's question or request
+        use_rag: Whether to use retrieval-augmented generation
+        agent_type: Override automatic agent type detection
+    
+    Yields:
+        str: Tokens as they are generated
+    """
+    if _llm is None:
+        initialize_models()
+
+    model, tokenizer = _llm
+
+    # Detect agent type if not specified
+    if agent_type is None:
+        agent_type = detect_agent_type(prompt)
+
+    print(f"🤖 Agent Type: {agent_type} (streaming)")
+
+    # Build context
+    if use_rag:
+        context_chunks = retrieve_top_k(prompt, k=4)
+        context = "\n".join(context_chunks)
+        print(f"📚 Retrieved {len(context_chunks)} relevant chunks")
+    else:
+        context = ""
+
+    # Use domain-specific system prompts
+    if agent_type == "energy":
+        system_msg = ENERGY_SYSTEM_PROMPT
+    elif agent_type == "customer_service":
+        system_msg = CUSTOMER_SERVICE_SYSTEM_PROMPT
+    elif agent_type == "visualization":
+        system_msg = VISUALIZATION_SYSTEM_PROMPT
+    else:
+        system_msg = GENERAL_SYSTEM_PROMPT
+
+    # Build the user prompt with context
+    if context:
+        user_prompt = f"""Using the following information:
+{context}
+
+Question: {prompt}
+
+Answer:"""
+    else:
+        user_prompt = f"""Question: {prompt}
+
+Answer:"""
+
+    messages = [
+        {"role": "system", "content": system_msg},
+        {"role": "user", "content": user_prompt},
+    ]
+
+    text = tokenizer.apply_chat_template(
+        messages, tokenize=False, add_generation_prompt=True
+    )
+
+    model_inputs = tokenizer([text], return_tensors="pt").to(model.device)
+
+    # Set up streamer for real-time token output
+    streamer = TextIteratorStreamer(tokenizer, skip_prompt=True, skip_special_tokens=True)
+
+    # Generation kwargs
+    generation_kwargs = dict(
+        **model_inputs,
+        max_new_tokens=200,
+        temperature=0.3,
+        top_p=0.85,
+        do_sample=True,
+        repetition_penalty=1.15,
+        pad_token_id=tokenizer.eos_token_id,
+        streamer=streamer,
+    )
+
+    # Run generation in a separate thread
+    generation_thread = threading.Thread(target=model.generate, kwargs=generation_kwargs)
+    generation_thread.start()
+
+    # Yield tokens as they come
+    for token in streamer:
+        yield token
+
+    generation_thread.join()
 
 
 # ============================================================================
