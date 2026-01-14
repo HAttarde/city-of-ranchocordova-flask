@@ -155,7 +155,21 @@ def analyze_visualization_request(
         json_match = re.search(r'\{.*\}', response, re.DOTALL)
         if json_match:
             spec = json.loads(json_match.group())
+            
+            # If LLM returned needs_visualization: false, check if query has viz keywords
+            # and use fallback if it does (LLM may have been wrong)
+            if not spec.get("needs_visualization", False):
+                print("🔍 LLM returned needs_visualization: false - checking for keywords...")
+                fallback_spec = _fallback_analysis(query)
+                if fallback_spec and fallback_spec.get("needs_visualization", False):
+                    print("✅ Fallback detected visualization is needed - overriding LLM")
+                    return fallback_spec
+            
             return spec
+        else:
+            # No JSON found - use fallback
+            print("⚠️ No JSON found in LLM response - using fallback")
+            return _fallback_analysis(query)
     except json.JSONDecodeError as e:
         print(f"⚠️ JSON parse error: {e}")
         # Fallback to keyword-based detection
