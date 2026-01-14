@@ -1,566 +1,567 @@
 <!doctype html>
 <html lang="en">
-    <head>
-        <meta charset="UTF-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>{{ dept_display }} - {{ agent_name }}</title>
-        <link
-            href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
-            rel="stylesheet"
-        />
-        <link
-            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
-            rel="stylesheet"
-        />
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/4.3.0/marked.min.js"></script>
-        <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-        <link
-            rel="stylesheet"
-            href="{{ url_for('static', filename='style.css') }}"
-        />
 
-        <style>
-            body {
-                background-color: #f5f7fa;
-                font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-                min-height: 100vh;
-                display: flex;
-                flex-direction: column;
-                margin: 0;
-                padding: 0;
-            }
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{{ dept_display }} - {{ agent_name }}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/4.3.0/marked.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
 
-            .main-container {
-                flex: 1;
-                display: flex;
-                flex-direction: column;
-                width: 90%;
-                max-width: 1400px;
-                margin: 0 auto;
-                padding: 20px 15px;
-            }
+    <style>
+        body {
+            background-color: #f5f7fa;
+            font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            margin: 0;
+            padding: 0;
+        }
 
-            .chat-container {
-                flex: 1;
-                background-color: #ffffff;
-                border-radius: 20px;
-                box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
-                overflow: hidden;
-                display: flex;
-                flex-direction: column;
-                height: 80vh;
-                border: 1px solid #e9ecef;
-            }
+        .main-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            width: 90%;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px 15px;
+        }
 
-            .chat-header {
-                background: linear-gradient(90deg, #2563eb 0%, #6d28d9 100%);
-                color: white;
-                padding: 25px;
-                text-align: center;
-                flex-shrink: 0;
-            }
+        .chat-container {
+            flex: 1;
+            background-color: #ffffff;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            height: 80vh;
+            border: 1px solid #e9ecef;
+        }
 
-            .chat-header h4 {
-                margin: 0;
-                font-weight: 300;
-                font-size: 1.5rem;
-            }
+        .chat-header {
+            background: linear-gradient(90deg, #2563eb 0%, #6d28d9 100%);
+            color: white;
+            padding: 25px;
+            text-align: center;
+            flex-shrink: 0;
+        }
 
-            .chat-window {
-                flex: 1;
-                overflow-y: auto;
-                padding: 25px 35px;
-                background: #ffffff;
-                min-height: 0;
-                max-height: calc(80vh - 220px);
-                scroll-behavior: smooth;
-            }
+        .chat-header h4 {
+            margin: 0;
+            font-weight: 300;
+            font-size: 1.5rem;
+        }
 
-            .message {
-                margin-bottom: 20px;
-                display: flex;
-                align-items: flex-start;
-                gap: 15px;
-            }
+        .chat-window {
+            flex: 1;
+            overflow-y: auto;
+            padding: 25px 35px;
+            background: #ffffff;
+            min-height: 0;
+            max-height: calc(80vh - 220px);
+            scroll-behavior: smooth;
+        }
 
-            .user-message {
-                flex-direction: row-reverse;
-            }
+        .message {
+            margin-bottom: 20px;
+            display: flex;
+            align-items: flex-start;
+            gap: 15px;
+        }
 
-            .bot-message {
-                flex-direction: row;
-            }
+        .user-message {
+            flex-direction: row-reverse;
+        }
 
-            .message-avatar {
-                width: 40px;
-                height: 40px;
-                border-radius: 50%;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                font-size: 18px;
-                flex-shrink: 0;
-            }
+        .bot-message {
+            flex-direction: row;
+        }
 
-            .user-avatar {
-                background-color: #4ab579;
-                color: white;
-            }
+        .message-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            flex-shrink: 0;
+        }
 
-            .bot-avatar {
-                background-color: #28a745;
-                color: #fff;
-            }
+        .user-avatar {
+            background-color: #4ab579;
+            color: white;
+        }
 
-            .message-content {
-                max-width: 85%;
-                padding: 18px 22px;
-                border-radius: 18px;
-                word-wrap: break-word;
-                font-size: 15px;
-                line-height: 1.6;
-                box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
-            }
+        .bot-avatar {
+            background-color: #28a745;
+            color: #fff;
+        }
 
-            .user-message .message-content {
-                background-color: #f8f9fa;
-                color: #333;
-                border-bottom-right-radius: 5px;
-            }
+        .message-content {
+            max-width: 85%;
+            padding: 18px 22px;
+            border-radius: 18px;
+            word-wrap: break-word;
+            font-size: 15px;
+            line-height: 1.6;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+        }
 
-            .bot-message .message-content {
-                background-color: #f8f9fa;
-                color: #333;
-                border: 1px solid #e9ecef;
-                border-bottom-left-radius: 5px;
-            }
+        .user-message .message-content {
+            background-color: #f8f9fa;
+            color: #333;
+            border-bottom-right-radius: 5px;
+        }
 
-            .chat-input {
-                padding: 25px 35px;
-                background-color: #ffffff;
-                border-top: 1px solid rgba(0, 0, 0, 0.1);
-                flex-shrink: 0;
-            }
+        .bot-message .message-content {
+            background-color: #f8f9fa;
+            color: #333;
+            border: 1px solid #e9ecef;
+            border-bottom-left-radius: 5px;
+        }
 
-            .input-container {
-                background: white;
-                border-radius: 25px;
-                padding: 8px;
-                box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
-                border: 1px solid #e9ecef;
-                display: flex;
-                align-items: center;
-                width: 100%;
-            }
+        .chat-input {
+            padding: 25px 35px;
+            background-color: #ffffff;
+            border-top: 1px solid rgba(0, 0, 0, 0.1);
+            flex-shrink: 0;
+        }
 
-            #prompt {
-                border: none;
-                outline: none;
-                flex: 1;
-                padding: 12px 20px;
-                font-size: 16px;
-                background: transparent;
-            }
+        .input-container {
+            background: white;
+            border-radius: 25px;
+            padding: 8px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+            border: 1px solid #e9ecef;
+            display: flex;
+            align-items: center;
+            width: 100%;
+        }
 
-            .send-btn {
-                background: linear-gradient(90deg, #28a745 0%, #20c997 100%);
-                border: none;
-                color: white;
-                padding: 12px 20px;
-                border-radius: 20px;
-                cursor: pointer;
-                display: flex;
-                align-items: center;
-                gap: 8px;
-                font-weight: 500;
-            }
+        #prompt {
+            border: none;
+            outline: none;
+            flex: 1;
+            padding: 12px 20px;
+            font-size: 16px;
+            background: transparent;
+        }
 
-            .welcome-message {
-                background: #e8f5e9;
-                padding: 15px;
-                border-radius: 15px;
-                margin-bottom: 20px;
-                color: #2e7d32;
-                font-weight: 500;
-                display: flex;
-                align-items: center;
-                gap: 10px;
-            }
+        .send-btn {
+            background: linear-gradient(90deg, #28a745 0%, #20c997 100%);
+            border: none;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 20px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 500;
+        }
 
-            .input-loading {
-                display: none;
-                text-align: center;
-                margin-bottom: 15px;
-                padding: 12px;
-                background: rgba(40, 167, 69, 0.1);
-                border-radius: 15px;
-            }
+        .welcome-message {
+            background: #e8f5e9;
+            padding: 15px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            color: #2e7d32;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
 
-            .loading-text {
-                font-size: 14px;
-                font-weight: 500;
-                background: linear-gradient(
-                    -45deg,
+        .input-loading {
+            display: none;
+            text-align: center;
+            margin-bottom: 15px;
+            padding: 12px;
+            background: rgba(40, 167, 69, 0.1);
+            border-radius: 15px;
+        }
+
+        .loading-text {
+            font-size: 14px;
+            font-weight: 500;
+            background: linear-gradient(-45deg,
                     #28a745,
                     #20c997,
                     #43e97b,
-                    #38ef7d
-                );
-                background-size: 400% 400%;
-                background-clip: text;
-                -webkit-background-clip: text;
-                -webkit-text-fill-color: transparent;
-                animation: colorShift 2s ease-in-out infinite;
+                    #38ef7d);
+            background-size: 400% 400%;
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: colorShift 2s ease-in-out infinite;
+        }
+
+        @keyframes colorShift {
+            0% {
+                background-position: 0% 50%;
             }
 
-            @keyframes colorShift {
-                0% {
-                    background-position: 0% 50%;
-                }
-                50% {
-                    background-position: 100% 50%;
-                }
-                100% {
-                    background-position: 0% 50%;
-                }
+            50% {
+                background-position: 100% 50%;
             }
 
-            .user-badge {
-                display: inline-flex;
-                align-items: center;
-                gap: 0.45rem;
-                cursor: pointer;
-                user-select: none;
-                margin-right: 30px;
+            100% {
+                background-position: 0% 50%;
             }
+        }
 
-            .user-letter {
-                width: 32px;
-                height: 32px;
-                background: #e7f5fd;
-                color: #3b6fbb;
-                border-radius: 6px;
-                display: grid;
-                place-content: center;
-                font-weight: 600;
-            }
+        .user-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.45rem;
+            cursor: pointer;
+            user-select: none;
+            margin-right: 30px;
+        }
 
-            .logout-popover {
-                position: absolute;
-                top: 105%;
-                right: 0;
-                background: #fff;
-                border: 1px solid #dee2e6;
-                border-radius: 8px;
-                box-shadow: 0 4px 14px rgba(0, 0, 0, 0.12);
-                padding: 0.5rem 0.8rem;
-                min-width: 140px;
-                display: none;
-                z-index: 1055;
-            }
+        .user-letter {
+            width: 32px;
+            height: 32px;
+            background: #e7f5fd;
+            color: #3b6fbb;
+            border-radius: 6px;
+            display: grid;
+            place-content: center;
+            font-weight: 600;
+        }
 
-            .logout-popover a {
-                color: #dc3545;
-                text-decoration: none;
-                display: flex;
-                align-items: center;
-                gap: 0.5rem;
-            }
+        .logout-popover {
+            position: absolute;
+            top: 105%;
+            right: 0;
+            background: #fff;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.12);
+            padding: 0.5rem 0.8rem;
+            min-width: 140px;
+            display: none;
+            z-index: 1055;
+        }
 
-            /* Better scrollbar styling */
-            .chat-window::-webkit-scrollbar {
-                width: 6px;
-            }
+        .logout-popover a {
+            color: #dc3545;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
 
-            .chat-window::-webkit-scrollbar-track {
-                background: #f1f1f1;
-                border-radius: 10px;
-            }
+        /* Better scrollbar styling */
+        .chat-window::-webkit-scrollbar {
+            width: 6px;
+        }
 
-            .chat-window::-webkit-scrollbar-thumb {
-                background: #c1c1c1;
-                border-radius: 10px;
-            }
+        .chat-window::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
 
-            .chat-window::-webkit-scrollbar-thumb:hover {
-                background: #a8a8a8;
-            }
+        .chat-window::-webkit-scrollbar-thumb {
+            background: #c1c1c1;
+            border-radius: 10px;
+        }
 
-            /* Markdown content styling */
-            .message-content ul,
-            .message-content ol {
-                margin: 1rem 0;
-                padding-left: 1.5rem;
-            }
+        .chat-window::-webkit-scrollbar-thumb:hover {
+            background: #a8a8a8;
+        }
 
-            .message-content li {
-                margin: 0.5rem 0;
-                line-height: 1.6;
-            }
+        /* Markdown content styling */
+        .message-content ul,
+        .message-content ol {
+            margin: 1rem 0;
+            padding-left: 1.5rem;
+        }
 
-            .message-content strong {
-                color: #2c3e50;
-                font-weight: 600;
-            }
+        .message-content li {
+            margin: 0.5rem 0;
+            line-height: 1.6;
+        }
 
-            .message-content h2 {
-                color: #2c3e50;
-                font-size: 1.5rem;
-                margin-top: 1.5rem;
-                margin-bottom: 0.75rem;
-                font-weight: 600;
-                border-bottom: 2px solid #28a745;
-                padding-bottom: 0.5rem;
-            }
+        .message-content strong {
+            color: #2c3e50;
+            font-weight: 600;
+        }
 
-            .message-content h3 {
-                color: #34495e;
-                font-size: 1.25rem;
-                margin-top: 1.25rem;
-                margin-bottom: 0.5rem;
-                font-weight: 600;
-            }
+        .message-content h2 {
+            color: #2c3e50;
+            font-size: 1.5rem;
+            margin-top: 1.5rem;
+            margin-bottom: 0.75rem;
+            font-weight: 600;
+            border-bottom: 2px solid #28a745;
+            padding-bottom: 0.5rem;
+        }
 
-            /* Chart container styles */
-            .chart-container {
-                margin-top: 20px;
-                padding: 20px;
-                background: white;
-                border-radius: 12px;
-                border: 1px solid #e0e0e0;
-                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-            }
+        .message-content h3 {
+            color: #34495e;
+            font-size: 1.25rem;
+            margin-top: 1.25rem;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
 
-            .chart-title {
-                font-size: 16px;
-                font-weight: 600;
-                color: #2c3e50;
-                margin-bottom: 15px;
-                text-align: center;
-            }
+        /* Chart container styles */
+        .chart-container {
+            margin-top: 20px;
+            padding: 20px;
+            background: white;
+            border-radius: 12px;
+            border: 1px solid #e0e0e0;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
 
-            .chart-canvas-wrapper {
-                position: relative;
-                height: 300px;
-                width: 100%;
-            }
-        </style>
-    </head>
-    <body>
-        <!-- Navbar -->
-        <nav
-            class="navbar navbar-light bg-white shadow-sm sticky-top"
-            style="height: 85px"
-        >
-            <div class="container-fluid h-100 align-items-center">
-                <div class="d-flex align-items-center">
-                    <a href="{{ url_for('login') }}">
-                        <img
-                            src="{{ url_for('static', filename='ranchocordova.jpeg') }}"
-                            alt="Logo"
-                            style="height: 55px"
-                        />
+        .chart-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .chart-canvas-wrapper {
+            position: relative;
+            height: 300px;
+            width: 100%;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-light bg-white shadow-sm sticky-top" style="height: 85px">
+        <div class="container-fluid h-100 align-items-center">
+            <div class="d-flex align-items-center">
+                <a href="{{ url_for('login') }}">
+                    <img src="{{ url_for('static', filename='ranchocordova.jpeg') }}" alt="Logo" style="height: 55px" />
+                </a>
+            </div>
+
+            <div class="position-relative">
+                <div class="user-badge" onclick="toggleLogout()">
+                    <span class="text-dark fw-500">Admin</span>
+                    <i class="fa fa-chevron-down small text-muted"></i>
+                </div>
+                <div class="logout-popover" id="logoutBox">
+                    <a href="{{ url_for('logout') }}">
+                        <i class="fa fa-door-open"></i><span>Logout</span>
                     </a>
                 </div>
-
-                <div class="position-relative">
-                    <div class="user-badge" onclick="toggleLogout()">
-                        <span class="text-dark fw-500">Admin</span>
-                        <i class="fa fa-chevron-down small text-muted"></i>
-                    </div>
-                    <div class="logout-popover" id="logoutBox">
-                        <a href="{{ url_for('logout') }}">
-                            <i class="fa fa-door-open"></i><span>Logout</span>
-                        </a>
-                    </div>
-                </div>
             </div>
-        </nav>
+        </div>
+    </nav>
 
-        <div class="main-container">
-            <h2
-                class="text-center"
-                style="
+    <div class="main-container">
+        <h2 class="text-center" style="
                     font-size: 2.3rem;
                     font-weight: 700;
                     margin-top: 25px;
                     margin-bottom: 20px;
                     letter-spacing: -0.5px;
-                "
-            >
-                {{ dept_display }} - {{ agent_name }}
-            </h2>
+                ">
+            {{ dept_display }} - {{ agent_name }}
+        </h2>
 
-            <div class="chat-container">
-                <div class="chat-header">
-                    <h4 class="mb-0">Conversational Intelligence</h4>
+        <div class="chat-container">
+            <div class="chat-header">
+                <h4 class="mb-0">Conversational Intelligence</h4>
+            </div>
+
+            <div class="chat-window" id="chat-window">
+                <div class="welcome-message">
+                    <i class="fas fa-leaf"></i>
+                    Welcome to the {{ agent_name }}! How can I assist you
+                    today?
                 </div>
 
-                <div class="chat-window" id="chat-window">
-                    <div class="welcome-message">
-                        <i class="fas fa-leaf"></i>
-                        Welcome to the {{ agent_name }}! How can I assist you
-                        today?
+                <div class="message bot-message">
+                    <div class="message-avatar bot-avatar">
+                        <i class="fas fa-robot"></i>
                     </div>
-
-                    <div class="message bot-message">
-                        <div class="message-avatar bot-avatar">
-                            <i class="fas fa-robot"></i>
-                        </div>
-                        <div class="message-content">
-                            Hello! I'm your {{ agent_name }}. I'm here to help
-                            answer your questions. What would you like to know?
-                        </div>
+                    <div class="message-content">
+                        Hello! I'm your {{ agent_name }}. I'm here to help
+                        answer your questions. What would you like to know?
                     </div>
-                </div>
-
-                <div class="chat-input">
-                    <div class="input-loading" id="input-loading">
-                        <div class="loading-text">
-                            <b>Generating response from server...</b>
-                        </div>
-                    </div>
-
-                    <form id="chat-form">
-                        <div class="input-container">
-                            <input
-                                type="text"
-                                id="prompt"
-                                placeholder="How can I help you?"
-                            />
-                            <button type="submit" class="send-btn">
-                                <i class="fas fa-paper-plane"></i>
-                            </button>
-                        </div>
-                    </form>
                 </div>
             </div>
+
+            <div class="chat-input">
+                <div class="input-loading" id="input-loading">
+                    <div class="loading-text">
+                        <b>Generating response from server...</b>
+                    </div>
+                </div>
+
+                <form id="chat-form">
+                    <div class="input-container">
+                        <input type="text" id="prompt" placeholder="How can I help you?" />
+                        <button type="submit" class="send-btn">
+                            <i class="fas fa-paper-plane"></i>
+                        </button>
+                    </div>
+                </form>
+            </div>
         </div>
+    </div>
 
-        <script>
-            const form = document.getElementById("chat-form");
-            const promptInput = document.getElementById("prompt");
-            const chatWindow = document.getElementById("chat-window");
-            const agentType = "{{ agent_type }}";
-            let chartInstances = [];
+    <script>
+        const form = document.getElementById("chat-form");
+        const promptInput = document.getElementById("prompt");
+        const chatWindow = document.getElementById("chat-window");
+        const agentType = "{{ agent_type }}";
+        let chartInstances = [];
 
-            window.addEventListener("load", () => promptInput.focus());
+        window.addEventListener("load", () => promptInput.focus());
 
-            function createVisualization(vizData) {
-                console.log("📊 Creating visualization, type:", typeof vizData);
+        function createVisualization(chartConfig) {
+            console.log("📊 Creating Chart.js visualization");
+            console.log("📊 Chart config:", JSON.stringify(chartConfig, null, 2));
 
-                const container = document.createElement("div");
-                container.className = "chart-container";
-                container.style.cssText =
-                    "margin: 20px 0; text-align: center; padding: 15px; background: #f8f9fa; border-radius: 10px;";
-
-                const img = document.createElement("img");
-                img.src = vizData; // vizData is now a base64 string
-                img.style.cssText =
-                    "max-width: 100%; height: auto; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);";
-                img.alt = "Visualization Chart";
-
-                img.onload = () => {
-                    console.log(
-                        "✅ Chart displayed!",
-                        img.naturalWidth,
-                        "x",
-                        img.naturalHeight,
-                    );
-                };
-
-                img.onerror = () => {
-                    console.error("❌ Failed to display chart");
-                    container.innerHTML =
-                        '<p style="color: red;">Failed to load visualization</p>';
-                };
-
-                container.appendChild(img);
-                return container;
+            // Validate chart config
+            if (!chartConfig || !chartConfig.type || !chartConfig.data) {
+                console.error("❌ Invalid chart config - missing type or data");
+                return null;
             }
 
-            function formatResponse(text) {
+            if (!chartConfig.data.datasets || chartConfig.data.datasets.length === 0) {
+                console.error("❌ Invalid chart config - no datasets");
+                return null;
+            }
+
+            const container = document.createElement("div");
+            container.className = "chart-container";
+            container.style.cssText =
+                "margin: 20px 0; padding: 20px; background: #fff; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); min-height: 350px;";
+
+            // Create canvas wrapper for proper sizing
+            const canvasWrapper = document.createElement("div");
+            canvasWrapper.className = "chart-canvas-wrapper";
+            canvasWrapper.style.cssText = "position: relative; height: 300px; width: 100%;";
+
+            const canvas = document.createElement("canvas");
+            canvas.id = "chart-" + Date.now();
+            canvasWrapper.appendChild(canvas);
+            container.appendChild(canvasWrapper);
+
+            // Need to append to DOM first, then render chart
+            // We'll render in a timeout after the container is added to DOM
+            container.setAttribute("data-chart-config", JSON.stringify(chartConfig));
+            container.setAttribute("data-canvas-id", canvas.id);
+
+            // Render chart after DOM is ready
+            setTimeout(() => {
                 try {
-                    marked.setOptions({
-                        breaks: true,
-                        gfm: true,
-                        tables: true,
-                        headerIds: false,
-                        mangle: false,
-                    });
-
-                    let html = marked.parse(text);
-                    html = html.replace(
-                        /<table>/g,
-                        '<table class="table table-hover table-bordered">',
-                    );
-                    html = html.replace(
-                        /<thead>/g,
-                        '<thead class="table-light">',
-                    );
-
-                    return html;
+                    const canvasEl = document.getElementById(canvas.id);
+                    if (!canvasEl) {
+                        console.error("❌ Canvas not found in DOM");
+                        return;
+                    }
+                    console.log("📊 Rendering chart on canvas:", canvas.id);
+                    const chart = new Chart(canvasEl, chartConfig);
+                    chartInstances.push(chart);
+                    console.log("✅ Chart.js chart rendered successfully");
                 } catch (error) {
-                    console.error("Markdown parsing error:", error);
-                    return text.replace(/\n/g, "<br>");
+                    console.error("❌ Chart.js render error:", error);
+                    container.innerHTML =
+                        '<p style="color: red; text-align: center;">Failed to render chart: ' + error.message + '</p>';
                 }
+            }, 200);
+
+            return container;
+        }
+
+
+
+        function formatResponse(text) {
+            try {
+                marked.setOptions({
+                    breaks: true,
+                    gfm: true,
+                    tables: true,
+                    headerIds: false,
+                    mangle: false,
+                });
+
+                let html = marked.parse(text);
+                html = html.replace(
+                    /<table>/g,
+                    '<table class="table table-hover table-bordered">',
+                );
+                html = html.replace(
+                    /<thead>/g,
+                    '<thead class="table-light">',
+                );
+
+                return html;
+            } catch (error) {
+                console.error("Markdown parsing error:", error);
+                return text.replace(/\n/g, "<br>");
             }
+        }
 
-            form.addEventListener("submit", async (e) => {
-                e.preventDefault();
+        form.addEventListener("submit", async (e) => {
+            e.preventDefault();
 
-                const userMessage = promptInput.value.trim();
-                if (!userMessage) return;
+            const userMessage = promptInput.value.trim();
+            if (!userMessage) return;
 
-                const userDiv = document.createElement("div");
-                userDiv.className = "message user-message";
-                userDiv.innerHTML = `
+            const userDiv = document.createElement("div");
+            userDiv.className = "message user-message";
+            userDiv.innerHTML = `
                     <div class="message-avatar user-avatar">
                         <i class="fas fa-user"></i>
                     </div>
                     <div class="message-content">${userMessage}</div>
                 `;
-                chatWindow.appendChild(userDiv);
-                promptInput.value = "";
+            chatWindow.appendChild(userDiv);
+            promptInput.value = "";
 
-                scrollToBottom();
-                document.getElementById("input-loading").style.display =
-                    "block";
+            scrollToBottom();
+            document.getElementById("input-loading").style.display =
+                "block";
 
-                try {
-                    const response = await fetch("/rancho_agent_api", {
-                        method: "POST",
-                        headers: {
-                            "Content-Type": "application/json",
-                        },
-                        body: JSON.stringify({ query: userMessage }),
-                    });
+            try {
+                const response = await fetch("/rancho_agent_api", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({ query: userMessage }),
+                });
 
-                    const data = await response.json();
-                    console.log("📊 Response received");
-                    console.log("Has visualization:", !!data.visualization);
+                const data = await response.json();
+                console.log("📊 Response received");
+                console.log("Has chart_config:", !!data.chart_config);
 
-                    if (data.visualization) {
-                        console.log(
-                            "Visualization length:",
-                            data.visualization.length,
-                        );
-                        console.log(
-                            "Starts with:",
-                            data.visualization.substring(0, 30),
-                        );
-                    }
-
-                    document.getElementById("input-loading").style.display =
-                        "none";
-
-                    const formattedAnswer = formatResponse(
-                        data.answer || "No response",
+                if (data.chart_config) {
+                    console.log(
+                        "Chart type:",
+                        data.chart_config.type,
                     );
+                }
 
-                    const botDiv = document.createElement("div");
-                    botDiv.className = "message bot-message";
-                    botDiv.innerHTML = `
+                document.getElementById("input-loading").style.display =
+                    "none";
+
+                const formattedAnswer = formatResponse(
+                    data.answer || "No response",
+                );
+
+                const botDiv = document.createElement("div");
+                botDiv.className = "message bot-message";
+                botDiv.innerHTML = `
                         <div class="message-avatar bot-avatar">
                             <i class="fas fa-robot"></i>
                         </div>
@@ -568,56 +569,64 @@
                             ${formattedAnswer}
                         </div>
                     `;
-                    chatWindow.appendChild(botDiv);
+                chatWindow.appendChild(botDiv);
 
-                    // Add visualization if present
-                    if (data.visualization) {
-                        const vizContainer = createVisualization(
-                            data.visualization,
-                        );
+                // Add Chart.js visualization if present
+                if (data.chart_config) {
+                    console.log("📊 Attempting to create visualization...");
+                    const vizContainer = createVisualization(
+                        data.chart_config,
+                    );
+                    if (vizContainer) {
+                        console.log("📊 Appending chart container to message");
                         botDiv
                             .querySelector(".message-content")
                             .appendChild(vizContainer);
+                    } else {
+                        console.error("❌ createVisualization returned null");
                     }
+                }
 
-                    scrollToBottom();
-                } catch (error) {
-                    document.getElementById("input-loading").style.display =
-                        "none";
-                    console.error("Error:", error);
+                scrollToBottom();
+            } catch (error) {
+                document.getElementById("input-loading").style.display =
+                    "none";
+                console.error("Error:", error);
 
-                    const errorDiv = document.createElement("div");
-                    errorDiv.className = "message bot-message";
-                    errorDiv.innerHTML = `
+                const errorDiv = document.createElement("div");
+                errorDiv.className = "message bot-message";
+                errorDiv.innerHTML = `
                         <div class="message-avatar bot-avatar">
                             <i class="fas fa-robot"></i>
                         </div>
                         <div class="message-content">I apologize, but I encountered an error. Please try again.</div>
                     `;
-                    chatWindow.appendChild(errorDiv);
-                    scrollToBottom();
-                }
-            });
-
-            function scrollToBottom() {
-                requestAnimationFrame(() => {
-                    chatWindow.scrollTop = chatWindow.scrollHeight;
-                });
+                chatWindow.appendChild(errorDiv);
+                scrollToBottom();
             }
+        });
 
-            function toggleLogout() {
-                const box = document.getElementById("logoutBox");
-                box.style.display =
-                    box.style.display === "block" ? "none" : "block";
-            }
 
-            document.addEventListener("click", function (e) {
-                const badge = document.querySelector(".user-badge");
-                const box = document.getElementById("logoutBox");
-                if (!badge.contains(e.target) && !box.contains(e.target)) {
-                    box.style.display = "none";
-                }
+        function scrollToBottom() {
+            requestAnimationFrame(() => {
+                chatWindow.scrollTop = chatWindow.scrollHeight;
             });
-        </script>
-    </body>
+        }
+
+        function toggleLogout() {
+            const box = document.getElementById("logoutBox");
+            box.style.display =
+                box.style.display === "block" ? "none" : "block";
+        }
+
+        document.addEventListener("click", function (e) {
+            const badge = document.querySelector(".user-badge");
+            const box = document.getElementById("logoutBox");
+            if (!badge.contains(e.target) && !box.contains(e.target)) {
+                box.style.display = "none";
+            }
+        });
+    </script>
+</body>
+
 </html>

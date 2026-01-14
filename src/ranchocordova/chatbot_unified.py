@@ -708,34 +708,24 @@ def chat(user_message: str, conversation_history: list = None) -> dict:
     return {"response": response, "agent_type": agent_type, "context_used": True}
 
 
-def _short_viz_response(prompt: str) -> str:
-    prompt = prompt.lower()
-
-    if "forecast" in prompt:
-        return "Here’s a 14-day energy consumption forecast based on recent trends."
-
-    if "trend" in prompt:
-        return "This chart shows how energy usage changes over time."
-
-    if "reason" in prompt:
-        return (
-            "This breakdown shows the most common reasons for customer service calls."
-        )
-
-    if "volume" in prompt:
-        return "This graph shows customer service call volume over time."
-
-    return "Here’s the visualization you requested."
-
-
 # ============================================================================
 # Backward Compatibility for Flask App
 # ============================================================================
 
 
 def generate_answer(prompt: str, agent_type: str = None) -> dict:
+    """
+    Generate answer with LLM-driven visualization support.
+    
+    Uses the LLM to:
+    1. Analyze if visualization is needed
+    2. Determine the best chart type
+    3. Generate Chart.js configuration for frontend rendering
+    """
     if _llm is None:
         initialize_models()
+
+    model, tokenizer = _llm
 
     if agent_type is None or agent_type == "":
         agent_type = detect_agent_type(prompt)
@@ -744,81 +734,79 @@ def generate_answer(prompt: str, agent_type: str = None) -> dict:
     print(f"📝 Query: {prompt}")
 
     # ------------------------------------------------------------------
-    # VISUALIZATION-ONLY SHORT CIRCUIT (NO LLM, NO CODE IN OUTPUT)
+    # PRE-CHECK: Only analyze visualization for relevant queries
     # ------------------------------------------------------------------
-
+    
+    chart_config = None
+    prompt_lower = prompt.lower()
+    
+    # Keywords that suggest a visualization might be needed
     viz_keywords = [
-        "chart",
-        "graph",
-        "plot",
-        "show",
-        "visualize",
-        "forecast",
-        "trend",
-        "reason",
-        "volume",
+        "chart", "graph", "plot", "show", "visualize", "display",
+        "trend", "compare", "comparison", "breakdown", "distribution",
+        "forecast", "predict", "over time", "volume"
     ]
-
-    if any(kw in prompt.lower() for kw in viz_keywords):
-        from .viz import generate_simple_visualization
-
-        visualization = generate_simple_visualization(prompt, _energy_df, _cs_df)
-
-        if visualization:
-            return {
-                "answer": _short_viz_response(prompt),
-                "visualization": visualization,
-            }
-
-    # ------------------------------------------------------------------
-    # NORMAL TEXT FLOW (LLM USED ONLY IF NOT A PLOT)
-    # ------------------------------------------------------------------
-
-    response_text = generate_response(prompt, use_rag=True, agent_type=agent_type)
-
-    return {"answer": response_text, "visualization": None}
-
-    # Simple visualization
-    visualization = None
-    viz_keywords = [
-        "chart",
-        "graph",
-        "plot",
-        "show",
-        "visualize",
-        "forecast",
-        "trend",
-        "reason",
-        "volume",
-    ]
-
-    if any(kw in prompt.lower() for kw in viz_keywords):
-        print(f"📊 Visualization keywords detected")
-        print(
-            f"📊 Energy DF: {len(_energy_df) if _energy_df is not None else 'None'} rows"
-        )
-        print(f"📊 CS DF: {len(_cs_df) if _cs_df is not None else 'None'} rows")
+    
+    needs_viz_check = any(kw in prompt_lower for kw in viz_keywords)
+    
+    if needs_viz_check:
+        print("📊 Query contains visualization keywords - analyzing...")
+        # ------------------------------------------------------------------
+        # LLM-DRIVEN VISUALIZATION (Chart.js)
+        # ------------------------------------------------------------------
+        
         try:
-            print(f"📊 Importing simple_hardcoded_viz...")
-            from .viz import generate_simple_visualization
-
-            print(f"📊 Import successful, generating...")
-            visualization = generate_simple_visualization(prompt, _energy_df, _cs_df)
-            if visualization:
-                print(f"✅ Visualization generated: {len(visualization)} chars")
-            else:
-                print(f"⚠️ generate_simple_visualization returned None")
+            from .llm_visualization import generate_llm_visualization
+            
+            chart_config = generate_llm_visualization(
+                query=prompt,
+                energy_df=_energy_df,
+                cs_df=_cs_df,
+                model=model,
+                tokenizer=tokenizer
+            )
+            
+            if chart_config:
+                print(f"✅ Generated Chart.js config: {chart_config.get('type', 'unknown')} chart")
         except Exception as e:
-            print(f"❌ Visualization error: {e}")
+            print(f"⚠️ Visualization generation failed: {e}")
             import traceback
-
             traceback.print_exc()
+            chart_config = None
     else:
-        print(f"ℹ️ No visualization keywords detected in: {prompt.lower()}")
+        print("ℹ️ No visualization keywords detected - skipping chart analysis")
 
-    result = {"answer": response_text, "visualization": visualization}
-    print(
-        f"📤 Returning: answer={len(result['answer'])} chars, viz={len(result['visualization']) if result['visualization'] else 0} chars"
-    )
 
-    return result
+    # ------------------------------------------------------------------
+    # GENERATE TEXT RESPONSE
+    # ------------------------------------------------------------------
+
+    if chart_config:
+        # If we have a chart, generate a brief explanation
+        response_text = _generate_viz_explanation(prompt, chart_config)
+    else:
+        # Normal text response with RAG
+        response_text = generate_response(prompt, use_rag=True, agent_type=agent_type)
+
+    return {"answer": response_text, "chart_config": chart_config}
+
+
+def _generate_viz_explanation(prompt: str, chart_config: dict) -> str:
+    """Generate a brief explanation for the visualization."""
+    prompt_lower = prompt.lower()
+    chart_type = chart_config.get("type", "chart")
+    title = chart_config.get("options", {}).get("plugins", {}).get("title", {}).get("text", "")
+    
+    if "forecast" in prompt_lower:
+        return f"Here's the energy consumption forecast based on recent trends. {title}"
+    elif "trend" in prompt_lower:
+        return f"This chart shows how the data changes over time. {title}"
+    elif "compare" in prompt_lower or "vs" in prompt_lower:
+        return f"Here's a comparison visualization. {title}"
+    elif "reason" in prompt_lower or "breakdown" in prompt_lower or "distribution" in prompt_lower:
+        return f"This breakdown shows the distribution of categories. {title}"
+    elif "volume" in prompt_lower:
+        return f"This chart displays the volume data over the selected period. {title}"
+    else:
+        return f"Here's the visualization you requested: {title}"
+

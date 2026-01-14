@@ -470,13 +470,13 @@ def rancho_agent_api():
         if not query or not query.strip():
             return jsonify({"answer": "Please provide a valid question."})
 
-        # generate_answer now auto-detects agent type and returns visualization
+        # generate_answer now auto-detects agent type and returns chart_config
         result = generate_answer(query, agent_type)
 
         return jsonify(
             {
                 "answer": result.get("answer", ""),
-                "visualization": result.get("visualization", None),
+                "chart_config": result.get("chart_config", None),  # Changed from visualization
                 "source": "rancho_cordova",
             }
         )
@@ -489,7 +489,7 @@ def rancho_agent_api():
         return jsonify(
             {
                 "answer": f"I encountered an error: {str(e)}",
-                "visualization": None,
+                "chart_config": None,
                 "source": "error",
             }
         ), 500
