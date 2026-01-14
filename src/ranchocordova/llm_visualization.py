@@ -350,7 +350,13 @@ def extract_chart_data(
     
     # Get column names and normalize them
     x_col = _find_column(df, data_spec.get("x_column", ""))
-    y_col = _find_column(df, data_spec.get("y_column", ""))
+    
+    # Handle both y_column (string) and y_columns (array) from LLM
+    y_col_raw = data_spec.get("y_column") or data_spec.get("y_columns")
+    if isinstance(y_col_raw, list):
+        y_col_raw = y_col_raw[0] if y_col_raw else ""
+    y_col = _find_column(df, y_col_raw or "")
+    
     group_by = data_spec.get("group_by")
     if group_by:
         group_by = _find_column(df, group_by)
