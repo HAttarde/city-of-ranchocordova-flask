@@ -367,12 +367,22 @@ def extract_chart_data(
     
     print(f"📊 Data extraction: dataset={dataset}, x={x_col}, y={y_col}, group_by={group_by}")
     
-    # Apply filters
-
+    # Apply filters (but skip filters on the group_by column - we want all groups)
     for f in filters:
         col = f.get("column")
         op = f.get("operator", "==")
         val = f.get("value")
+        
+        # Skip if filter column is the same as group_by (we want to compare ALL groups)
+        if group_by and col == group_by:
+            print(f"  ⏭️ Skipping filter on group_by column: {col}")
+            continue
+        
+        # Skip if value is missing or None (truncated JSON from LLM)
+        if val is None:
+            print(f"  ⏭️ Skipping filter with missing value: {col}")
+            continue
+            
         if col in df.columns:
             if op == "==":
                 df = df[df[col] == val]
