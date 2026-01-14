@@ -630,10 +630,16 @@ def generate_llm_visualization(
     print(f"✅ LLM determined chart type: {chart_type}")
     print(f"   Reasoning: {spec.get('reasoning', 'N/A')}")
     
-    # CHECK FOR FORECASTING
-    # Determine if this is a forecast/trend request BEFORE data extraction
-    # This allows us to disable the fallback logic that switches to categorical data
+    # CHECK FOR QUERY INTENT AND OVERRIDE CHART TYPE IF NEEDED
     query_lower = query.lower()
+    
+    # Comparison queries should use bar charts, not line charts
+    is_comparison = any(kw in query_lower for kw in ["compare", "vs", "versus", "comparison"])
+    if is_comparison and chart_type == "line":
+        print(f"📊 Comparison query detected - overriding chart type from 'line' to 'bar'")
+        chart_type = "bar"
+    
+    # Forecast/trend detection for later use
     is_forecast = any(kw in query_lower for kw in ["forecast", "predict", "future", "next"])
     is_trend = any(kw in query_lower for kw in ["trend", "over time"])
     
