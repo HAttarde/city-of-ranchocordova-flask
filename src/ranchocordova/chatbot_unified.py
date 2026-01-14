@@ -1,15 +1,3 @@
-"""
-Enhanced Unified Chatbot for Rancho Cordova with PDF Support
-=============================================================
-
-ENHANCEMENTS:
-1. PDF document integration for comprehensive knowledge
-2. Dynamic knowledge extraction (no hardcoded chunks)
-3. Better document-based answers
-4. Improved context from technical reports
-5. ChromaDB for persistent vector storage
-"""
-
 import os
 import re
 
@@ -43,7 +31,7 @@ def initialize_models():
     if _llm is not None:
         return
 
-    MODEL_NAME = "Qwen/Qwen2.5-0.5B-Instruct"
+    MODEL_NAME = "Qwen/Qwen2.5-1.5B-Instruct"
     print("Loading Rancho Cordova models with ChromaDB support...")
 
     tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME)
