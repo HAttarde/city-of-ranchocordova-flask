@@ -104,6 +104,16 @@ def initialize_models():
         chunks.extend(_extract_tou_rate_insights(base_path))
         chunks.extend(_extract_rebate_insights(base_path))
         chunks.extend(_extract_pdf_knowledge())
+        
+        # WEB CONTENT: Add cached web scraping content
+        try:
+            from .web_scraper import get_web_chunks
+            web_chunks = get_web_chunks()
+            if web_chunks:
+                chunks.extend(web_chunks)
+                print(f"  ✓ Added {len(web_chunks)} web content chunks")
+        except Exception as e:
+            print(f"  ⚠️ Error loading web chunks: {e}")
 
         print(f"✅ Total RAG chunks: {len(chunks)}")
 

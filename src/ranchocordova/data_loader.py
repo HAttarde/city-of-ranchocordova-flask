@@ -41,6 +41,9 @@ class EnergyDataLoader:
 
     # Text file storage
     text_contents = {}
+    
+    # Web content storage (from scraped websites)
+    web_contents = []
 
     def __new__(cls):
         if cls._instance is None:
@@ -96,6 +99,9 @@ class EnergyDataLoader:
 
             # Load additional text files
             self._load_text_files(base_path)
+            
+            # Load cached web content
+            self._load_web_content()
 
             self._data_loaded = True
             print("✅ Energy datasets loaded successfully")
@@ -195,6 +201,39 @@ class EnergyDataLoader:
                     print(f"  ✓ Loaded text file {filename}: {len(content)} characters")
                 except Exception as e:
                     print(f"  ⚠️  Error loading text file {filename}: {e}")
+
+    def _load_web_content(self):
+        """Load cached web content from scraper."""
+        print("\n🌐 Loading cached web content...")
+        try:
+            from .web_scraper import get_scraper
+            scraper = get_scraper()
+            self.web_contents = scraper.get_cached_content()
+            if self.web_contents:
+                print(f"  ✓ Loaded {len(self.web_contents)} cached web pages")
+            else:
+                print("  ⚠️  No cached web content found (run scraper to populate)")
+        except Exception as e:
+            print(f"  ⚠️  Error loading web content: {e}")
+            self.web_contents = []
+            
+    def get_web_contents(self) -> List[Dict]:
+        """Get all cached web content."""
+        return self.web_contents
+        
+    def refresh_web_content(self, site_key: Optional[str] = None):
+        """Refresh web content by re-scraping websites."""
+        try:
+            from .web_scraper import get_scraper
+            scraper = get_scraper()
+            if site_key:
+                scraper.crawl_site(site_key)
+            else:
+                scraper.crawl_all_sites()
+            # Reload cached content
+            self.web_contents = scraper.get_cached_content()
+        except Exception as e:
+            print(f"  ⚠️  Error refreshing web content: {e}")
 
     def get_pdf_content(self, filename: str) -> Optional[Dict]:
         """Get content from a specific PDF"""
