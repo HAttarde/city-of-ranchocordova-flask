@@ -59,6 +59,32 @@ def initialize_models():
     print("✅ Enhanced datasets loaded")
 
     # ========================================================================
+    # Auto-Crawl Websites (if cache is stale or empty)
+    # ========================================================================
+    
+    try:
+        from .web_scraper import get_scraper, SITE_CONFIGS, refresh_stale_sites
+        scraper = get_scraper()
+        
+        # Check if we need to crawl any sites
+        sites_to_crawl = [site for site in SITE_CONFIGS if scraper.needs_refresh(site)]
+        
+        if sites_to_crawl:
+            print(f"🌐 Web cache stale/empty for {len(sites_to_crawl)} site(s) - crawling...")
+            for site_key in sites_to_crawl:
+                try:
+                    scraper.crawl_site(site_key)
+                except Exception as e:
+                    print(f"  ⚠️ Failed to crawl {site_key}: {e}")
+            print("✅ Web crawling complete")
+        else:
+            stats = scraper.get_cache_stats()
+            total_pages = sum(s.get("pages", 0) for s in stats.values())
+            print(f"✅ Web cache up-to-date ({total_pages} cached pages)")
+    except Exception as e:
+        print(f"⚠️ Web scraping skipped: {e}")
+
+    # ========================================================================
     # ChromaDB Vector Store - Persistent Embeddings
     # ========================================================================
     
