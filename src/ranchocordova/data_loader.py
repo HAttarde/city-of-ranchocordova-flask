@@ -176,11 +176,12 @@ class EnergyDataLoader:
         """Load additional text files (non-CSV, non-PDF)"""
         print("\n📝 Loading text files...")
 
-        # Files already loaded as DataFrames
+        # Files already loaded as DataFrames or are binary
         skip_files = [
             "Energy.txt",
             "CustomerService.txt",
             "Department-city of Rancho Cordova.txt",
+            "web_cache.db",  # SQLite database, not a text file
         ]
 
         all_files = os.listdir(base_path)
@@ -189,6 +190,7 @@ class EnergyDataLoader:
                 filename in skip_files
                 or filename.endswith(".csv")
                 or filename.endswith(".pdf")
+                or filename.endswith(".db")  # Skip SQLite databases
             ):
                 continue
 
