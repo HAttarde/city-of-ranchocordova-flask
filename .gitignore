@@ -57,3 +57,7 @@ chroma_db/
 src/ranchocordova/chroma_db/
 
 ftb-app.zip
+
+# Web scraper cache (regenerated on startup, may trigger secret scanning)
+src/ranchocordova/data/web_cache.db
+*.db
