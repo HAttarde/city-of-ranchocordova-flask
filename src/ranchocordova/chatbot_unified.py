@@ -31,7 +31,7 @@ def initialize_models():
     if _llm is not None:
         return
 
-    MODEL_NAME = "openlm-research/open_llama_13b"
+    MODEL_NAME = "Qwen/Qwen2.5-7B-Instruct"
     print("Loading Rancho Cordova models with ChromaDB support...")
 
     tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME)
