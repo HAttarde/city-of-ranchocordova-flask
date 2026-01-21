@@ -31,7 +31,7 @@ def initialize_models():
     if _llm is not None:
         return
 
-    MODEL_NAME = "meta-llama/Llama-3.1-8B-Instruct"
+    MODEL_NAME = "openlm-research/open_llama_13b"
     print("Loading Rancho Cordova models with ChromaDB support...")
 
     tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME)
