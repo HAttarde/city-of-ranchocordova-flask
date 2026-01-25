@@ -23,11 +23,13 @@ python-pptx==0.6.23
 python-docx==1.1.2
 google-cloud-bigquery==3.27.0
 google-auth==2.38.0
-torch==2.3.1
-transformers==4.44.2
+# GPU dependencies - not needed for Groq API deployment
+# torch==2.3.1
+# transformers==4.44.2
+# accelerate==0.33.0
 sentence-transformers==3.0.1
-accelerate==0.33.0
 numpy==1.26.4
 pypdf
 chromadb>=0.4.0
 beautifulsoup4>=4.12.0
+groq>=0.4.0

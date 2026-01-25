@@ -2,7 +2,7 @@
 LLM-Driven Visualization Module
 ================================
 
-Uses the LLM to analyze user queries and generate Chart.js configurations.
+Uses the Groq API to analyze user queries and generate Chart.js configurations.
 The frontend renders interactive charts in the browser using Chart.js.
 
 Key Functions:
@@ -17,7 +17,8 @@ import re
 from typing import Dict, List, Optional, Tuple, Any
 
 import pandas as pd
-import torch
+
+from .groq_client import get_groq_client
 
 
 # ============================================================================
@@ -43,7 +44,7 @@ Available datasets:
    - Agent: Agent who handled the call
    - Resolution: How the call was resolved
 
-Based on the user's query, respond with a JSON object ONLY (no other text):
+Based on the user's query, respond with a JSON object:
 
 {{
     "needs_visualization": true or false,
@@ -71,10 +72,7 @@ Guidelines for chart type selection:
 - PIE/DOUGHNUT: For showing proportions/distribution (e.g., "breakdown", "distribution", "most common reasons")
 
 User query: "{query}"
-
-Respond with JSON only:"""
-
-
+"""
 
 
 # ============================================================================
@@ -107,75 +105,43 @@ CHART_COLORS = {
 # LLM ANALYSIS
 # ============================================================================
 
-def analyze_visualization_request(
-    query: str,
-    model,
-    tokenizer
-) -> Optional[Dict]:
+def analyze_visualization_request(query: str) -> Optional[Dict]:
     """
-    Use LLM to analyze user query and determine visualization needs.
+    Use Groq API to analyze user query and determine visualization needs.
     
     Returns:
         Dict with chart specification or None if no visualization needed
     """
+    groq = get_groq_client()
     prompt = VISUALIZATION_ANALYSIS_PROMPT.format(query=query)
     
-    messages = [
-        {"role": "system", "content": "You are a helpful data visualization assistant. Always respond with valid JSON only."},
-        {"role": "user", "content": prompt}
-    ]
+    system_msg = "You are a helpful data visualization assistant. Always respond with valid JSON only."
     
-    text = tokenizer.apply_chat_template(
-        messages, tokenize=False, add_generation_prompt=True
+    # Use JSON mode for structured output
+    result = groq.generate_json(
+        system_message=system_msg,
+        user_message=prompt,
+        max_tokens=512,
+        temperature=0.1,  # Low temperature for consistent JSON output
     )
     
-    model_inputs = tokenizer([text], return_tensors="pt").to(model.device)
-    
-    with torch.no_grad():
-        generated_ids = model.generate(
-            **model_inputs,
-            max_new_tokens=512,
-            temperature=0.1,  # Low temperature for consistent JSON output
-            do_sample=False,
-            pad_token_id=tokenizer.eos_token_id,
-        )
-    
-    generated_ids = [
-        output_ids[len(input_ids):]
-        for input_ids, output_ids in zip(model_inputs.input_ids, generated_ids)
-    ]
-    
-    response = tokenizer.batch_decode(generated_ids, skip_special_tokens=True)[0]
-    
-    print(f"🤖 LLM Visualization Analysis Response:\n{response[:500]}")
-    
-    # Parse JSON from response
-    try:
-        # Try to extract JSON from the response
-        json_match = re.search(r'\{.*\}', response, re.DOTALL)
-        if json_match:
-            spec = json.loads(json_match.group())
-            
-            # If LLM returned needs_visualization: false, check if query has viz keywords
-            # and use fallback if it does (LLM may have been wrong)
-            if not spec.get("needs_visualization", False):
-                print("🔍 LLM returned needs_visualization: false - checking for keywords...")
-                fallback_spec = _fallback_analysis(query)
-                if fallback_spec and fallback_spec.get("needs_visualization", False):
-                    print("✅ Fallback detected visualization is needed - overriding LLM")
-                    return fallback_spec
-            
-            return spec
-        else:
-            # No JSON found - use fallback
-            print("⚠️ No JSON found in LLM response - using fallback")
-            return _fallback_analysis(query)
-    except json.JSONDecodeError as e:
-        print(f"⚠️ JSON parse error: {e}")
-        # Fallback to keyword-based detection
+    if result:
+        print(f"🤖 LLM Visualization Analysis: needs_viz={result.get('needs_visualization')}, type={result.get('chart_type')}")
+        
+        # If LLM returned needs_visualization: false, check if query has viz keywords
+        # and use fallback if it does (LLM may have been wrong)
+        if not result.get("needs_visualization", False):
+            print("🔍 LLM returned needs_visualization: false - checking for keywords...")
+            fallback_spec = _fallback_analysis(query)
+            if fallback_spec and fallback_spec.get("needs_visualization", False):
+                print("✅ Fallback detected visualization is needed - overriding LLM")
+                return fallback_spec
+        
+        return result
+    else:
+        # No valid JSON - use fallback
+        print("⚠️ No valid JSON from LLM - using fallback")
         return _fallback_analysis(query)
-    
-    return None
 
 
 def _fallback_analysis(query: str) -> Optional[Dict]:
@@ -473,7 +439,6 @@ def extract_chart_data(
     # Convert to serializable types
     labels = [str(l) for l in labels]
     values = [float(v) for v in values]
-    
 
     return labels, values
 
@@ -597,8 +562,6 @@ def generate_llm_visualization(
     query: str,
     energy_df: pd.DataFrame,
     cs_df: pd.DataFrame,
-    model,
-    tokenizer
 ) -> Optional[Dict]:
     """
     Main entry point for LLM-driven visualization generation.
@@ -607,16 +570,14 @@ def generate_llm_visualization(
         query: User's query string
         energy_df: Energy consumption DataFrame
         cs_df: Customer service DataFrame
-        model: LLM model
-        tokenizer: LLM tokenizer
     
     Returns:
         Chart.js configuration dict or None if no visualization needed
     """
     print(f"📊 Analyzing visualization request: {query[:100]}...")
     
-    # Step 1: Analyze with LLM
-    spec = analyze_visualization_request(query, model, tokenizer)
+    # Step 1: Analyze with LLM (using Groq API now)
+    spec = analyze_visualization_request(query)
     
     if spec is None or not spec.get("needs_visualization", False):
         print("ℹ️ No visualization needed for this query")
@@ -653,13 +614,11 @@ def generate_llm_visualization(
         return None
     
     print(f"✅ Extracted {len(labels)} data points")
-    
-    print(f"✅ Extracted {len(labels)} data points")
 
     # If using single month data but user wants forecast/trend, generate synthetic points
     if (is_forecast or is_trend) and len(labels) < 2:
         print("📊 Forecast/Trend requested but insufficient data. Generating synthetic forecast points...")
-        predicted_labels, predicted_values = _generate_forecast_points(model, tokenizer, labels, values)
+        predicted_labels, predicted_values = _generate_forecast_points(labels, values)
         
         if predicted_labels:
             labels.extend(predicted_labels)
@@ -698,7 +657,7 @@ Historical Data: {history}
 Detect the trend and seasonality from the data (or general knowledge of energy/call patterns if data is scant) and project future values.
 For energy data, assume higher usage in summer (July-Aug) and winter (Jan-Dec) and lower in spring/fall.
 
-Respond with a JSON object ONLY:
+Respond with a JSON object:
 {{
     "forecast": [
         {{"label": "Next Period Label", "value": 123.45}},
@@ -708,57 +667,33 @@ Respond with a JSON object ONLY:
 """
 
 def _generate_forecast_points(
-    model, 
-    tokenizer, 
     labels: List[str], 
     values: List[float], 
     count: int = 3
 ) -> Tuple[List[str], List[float]]:
     """
-    Generate forecast points using LLM.
+    Generate forecast points using Groq API.
     """
+    groq = get_groq_client()
+    
     history = [f"{l}: {v}" for l, v in zip(labels[-5:], values[-5:])]
     prompt = FORECAST_PROMPT.format(num_points=count, history=", ".join(history))
     
-    messages = [
-        {"role": "system", "content": "You are a forecasting assistant. Output valid JSON only."},
-        {"role": "user", "content": prompt}
-    ]
-    
-    text = tokenizer.apply_chat_template(
-        messages, tokenize=False, add_generation_prompt=True
+    result = groq.generate_json(
+        system_message="You are a forecasting assistant. Output valid JSON only.",
+        user_message=prompt,
+        max_tokens=256,
+        temperature=0.7,  # Allow some creativity for forecasting
     )
     
-    model_inputs = tokenizer([text], return_tensors="pt").to(model.device)
-    
-    with torch.no_grad():
-        generated_ids = model.generate(
-            **model_inputs,
-            max_new_tokens=256,
-            temperature=0.7,
-            do_sample=True, # Allow some creativity for forecasting
-        )
-    
-    generated_ids = [
-        output_ids[len(input_ids):]
-        for input_ids, output_ids in zip(model_inputs.input_ids, generated_ids)
-    ]
-    
-    response = tokenizer.batch_decode(generated_ids, skip_special_tokens=True)[0]
-    
-    try:
-        json_match = re.search(r'\{.*\}', response, re.DOTALL)
-        if json_match:
-            data = json.loads(json_match.group())
-            forecast = data.get("forecast", [])
-            
+    if result:
+        forecast = result.get("forecast", [])
+        if forecast:
             new_labels = [item["label"] for item in forecast]
-            new_values = [item["value"] for item in forecast]
-            
+            new_values = [float(item["value"]) for item in forecast]
             return new_labels, new_values
-    except Exception as e:
-        print(f"⚠️ Forecast generation failed: {e}")
     
+    print("⚠️ Forecast generation failed")
     return [], []
 
 
@@ -798,13 +733,5 @@ if __name__ == "__main__":
     
     for q in queries:
         result = _fallback_analysis(q)
-        print(f"  Query: '{q}'")
-        print(f"    Needs viz: {result.get('needs_visualization')}")
-        print(f"    Chart type: {result.get('chart_type')}")
-        print()
-
-    print("\nTesting Forecast Logic (Mocking LLM):")
-    # We can't easily mock the LLM here without imports, so we will rely on inspection or user testing.
-    # However, we can check if the function _generate_forecast_points exists and is importable.
-    print(f"  _generate_forecast_points exists: {'_generate_forecast_points' in globals()}")
-
+        needs_viz = result.get("needs_visualization", False) if result else False
+        print(f"  '{q}' -> needs_viz={needs_viz}")

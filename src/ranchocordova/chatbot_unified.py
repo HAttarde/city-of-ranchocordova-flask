@@ -3,18 +3,17 @@ import re
 
 import numpy as np
 import pandas as pd
-import torch
 from sentence_transformers import SentenceTransformer
-from transformers import AutoModelForCausalLM, AutoTokenizer
 
 from .data_loader import get_data_loader
 from .vector_store import get_vector_store
+from .groq_client import get_groq_client
 
 # Import visualization module
 from .visualizations import generate_visualization
 
 # Globals
-_llm = None
+_groq = None
 _embedder = None
 _vector_store = None  # ChromaDB vector store
 _energy_df = None
@@ -23,24 +22,20 @@ _dept_df = None
 
 
 def initialize_models():
-    """Load LLM, embedder, KB and dataframes once. Uses ChromaDB for persistent storage."""
+    """Load embedder, KB and dataframes once. Uses ChromaDB for persistent storage and Groq API for LLM."""
     print("##### CALLING initialize_models()\n")
-    global _llm, _embedder, _vector_store
+    global _groq, _embedder, _vector_store
     global _energy_df, _cs_df, _dept_df
 
-    if _llm is not None:
+    if _groq is not None:
         return
 
-    MODEL_NAME = "Qwen/Qwen2.5-7B-Instruct"
-    print("Loading Rancho Cordova models with ChromaDB support...")
+    print("Loading Rancho Cordova models with Groq API + ChromaDB support...")
 
-    tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME)
-    model = AutoModelForCausalLM.from_pretrained(
-        MODEL_NAME, torch_dtype="auto", device_map="auto"
-    )
-    model.eval()
-
-    _llm = (model, tokenizer)
+    # Initialize Groq client (no local model needed!)
+    _groq = get_groq_client()
+    
+    # Embedder still runs locally (lightweight, CPU-friendly)
     _embedder = SentenceTransformer("all-MiniLM-L6-v2")
 
     base_path = os.path.join(os.path.dirname(__file__), "data")
@@ -59,21 +54,41 @@ def initialize_models():
     print("✅ Enhanced datasets loaded")
 
     # ========================================================================
-    # Load Web Content from Cache (pre-downloaded via download_web_content.py)
+    # Web Scraping - Auto-crawl on startup if cache is empty or stale
     # ========================================================================
     
     try:
-        from .web_scraper import get_scraper
+        from .web_scraper import get_scraper, SITE_CONFIGS
         scraper = get_scraper()
         stats = scraper.get_cache_stats()
         total_pages = sum(s.get("pages", 0) for s in stats.values())
         
-        if total_pages > 0:
+        # Check which sites need crawling
+        stale_sites = [site for site in SITE_CONFIGS if scraper.needs_refresh(site)]
+        
+        if total_pages > 0 and not stale_sites:
             print(f"✅ Web cache loaded ({total_pages} cached pages)")
         else:
-            print("⚠️ No web cache found. Run 'python download_web_content.py' to download.")
+            # Auto-crawl if cache is empty or stale
+            if stale_sites:
+                print(f"🌐 Auto-crawling {len(stale_sites)} website(s)... (this may take a few minutes)")
+                for site_key in stale_sites:
+                    site_name = SITE_CONFIGS[site_key]["name"]
+                    try:
+                        print(f"  🔍 Crawling {site_name}...")
+                        pages_scraped = scraper.crawl_site(site_key)
+                        print(f"  ✓ {site_name}: {pages_scraped} pages scraped")
+                    except Exception as e:
+                        print(f"  ⚠️ Error crawling {site_key}: {e}")
+                
+                # Update stats after crawling
+                stats = scraper.get_cache_stats()
+                total_pages = sum(s.get("pages", 0) for s in stats.values())
+                print(f"✅ Web scraping complete ({total_pages} total cached pages)")
+            else:
+                print("⚠️ No websites configured for scraping")
     except Exception as e:
-        print(f"⚠️ Web cache loading skipped: {e}")
+        print(f"⚠️ Web scraping skipped: {e}")
 
     # ========================================================================
     # ChromaDB Vector Store - Persistent Embeddings
@@ -142,7 +157,7 @@ def initialize_models():
     else:
         print(f"✅ Loaded {_vector_store.get_chunk_count()} cached embeddings from ChromaDB")
 
-    print("✅ Rancho models initialized with ChromaDB support.")
+    print("✅ Rancho models initialized with Groq API + ChromaDB support.")
 
 
 def _get_source_files(base_path: str) -> list:
@@ -493,24 +508,46 @@ def detect_agent_type(prompt: str) -> str:
 
 
 # ============================================================================
+# System Prompts
+# ============================================================================
+
+ENERGY_SYSTEM_PROMPT = """You are an energy efficiency expert for Rancho Cordova and SMUD.
+Provide helpful, accurate information about energy usage, rates, rebates, and savings tips.
+Use the provided context to give specific, data-driven answers.
+Be concise but thorough. Format your response with bullet points or numbered lists when appropriate."""
+
+CUSTOMER_SERVICE_SYSTEM_PROMPT = """You are a customer service representative for the City of Rancho Cordova.
+Help residents with city services, complaints, and requests. Be helpful and direct them to
+the appropriate department if needed.
+Be friendly, professional, and solution-oriented."""
+
+VISUALIZATION_SYSTEM_PROMPT = """You are a data visualization assistant. Help create charts and visualizations
+to understand energy data patterns and trends.
+When describing visualizations, be clear about what the chart shows and key insights."""
+
+GENERAL_SYSTEM_PROMPT = """You are a helpful assistant for Rancho Cordova residents.
+Provide accurate, concise answers to questions about city services and energy.
+If you're unsure about something, say so and suggest where they might find more information."""
+
+
+# ============================================================================
 # Generate Response
 # ============================================================================
 
 
 def generate_response(prompt: str, use_rag: bool = True, agent_type: str = None) -> str:
     """
-    Generate chatbot response with optional RAG and agent routing.
-    Optimized for fast, accurate, well-formatted responses.
+    Generate chatbot response using Groq API with optional RAG.
 
     Args:
         prompt: User's question or request
         use_rag: Whether to use retrieval-augmented generation
         agent_type: Override automatic agent type detection
     """
-    if _llm is None:
+    global _groq
+    
+    if _groq is None:
         initialize_models()
-
-    model, tokenizer = _llm
 
     # Detect agent type if not specified
     if agent_type is None:
@@ -528,27 +565,13 @@ def generate_response(prompt: str, use_rag: bool = True, agent_type: str = None)
 
     # Build system message based on agent type
     if agent_type == "energy":
-        system_msg = (
-            "You are an energy efficiency expert for Rancho Cordova and SMUD. "
-            "Provide helpful, accurate information about energy usage, rates, rebates, and savings tips. "
-            "Use the provided context to give specific, data-driven answers."
-        )
+        system_msg = ENERGY_SYSTEM_PROMPT
     elif agent_type == "customer_service":
-        system_msg = (
-            "You are a customer service representative for the City of Rancho Cordova. "
-            "Help residents with city services, complaints, and requests. Be helpful and direct them to "
-            "the appropriate department if needed."
-        )
+        system_msg = CUSTOMER_SERVICE_SYSTEM_PROMPT
     elif agent_type == "visualization":
-        system_msg = (
-            "You are a data visualization assistant. Help create charts and visualizations "
-            "to understand energy data patterns and trends."
-        )
+        system_msg = VISUALIZATION_SYSTEM_PROMPT
     else:
-        system_msg = (
-            "You are a helpful assistant for Rancho Cordova residents. "
-            "Provide accurate, concise answers to questions about city services and energy."
-        )
+        system_msg = GENERAL_SYSTEM_PROMPT
 
     # Build the full prompt
     if context:
@@ -563,33 +586,13 @@ Answer:"""
 
 Answer:"""
 
-    # Generate response with optimized parameters
-    messages = [
-        {"role": "system", "content": system_msg},
-        {"role": "user", "content": user_prompt},
-    ]
-
-    text = tokenizer.apply_chat_template(
-        messages, tokenize=False, add_generation_prompt=True
+    # Generate response using Groq API
+    response = _groq.generate_response(
+        system_message=system_msg,
+        user_message=user_prompt,
+        max_tokens=512,
+        temperature=0.7,
     )
-
-    model_inputs = tokenizer([text], return_tensors="pt").to(model.device)
-
-    with torch.no_grad():
-        generated_ids = model.generate(
-            **model_inputs,
-            max_new_tokens=512,
-            temperature=0.7,
-            top_p=0.9,
-            do_sample=False,
-        )
-
-    generated_ids = [
-        output_ids[len(input_ids):]
-        for input_ids, output_ids in zip(model_inputs.input_ids, generated_ids)
-    ]
-
-    response = tokenizer.batch_decode(generated_ids, skip_special_tokens=True)[0]
 
     return response.strip()
 
@@ -607,10 +610,10 @@ def generate_response_streaming(prompt: str, use_rag: bool = True, agent_type: s
     Yields:
         str: Tokens as they are generated
     """
-    if _llm is None:
+    global _groq
+    
+    if _groq is None:
         initialize_models()
-
-    model, tokenizer = _llm
 
     # Detect agent type if not specified
     if agent_type is None:
@@ -649,41 +652,14 @@ Answer:"""
 
 Answer:"""
 
-    messages = [
-        {"role": "system", "content": system_msg},
-        {"role": "user", "content": user_prompt},
-    ]
-
-    text = tokenizer.apply_chat_template(
-        messages, tokenize=False, add_generation_prompt=True
-    )
-
-    model_inputs = tokenizer([text], return_tensors="pt").to(model.device)
-
-    # Set up streamer for real-time token output
-    streamer = TextIteratorStreamer(tokenizer, skip_prompt=True, skip_special_tokens=True)
-
-    # Generation kwargs
-    generation_kwargs = dict(
-        **model_inputs,
-        max_new_tokens=200,
-        temperature=0.3,
-        top_p=0.85,
-        do_sample=True,
-        repetition_penalty=1.15,
-        pad_token_id=tokenizer.eos_token_id,
-        streamer=streamer,
-    )
-
-    # Run generation in a separate thread
-    generation_thread = threading.Thread(target=model.generate, kwargs=generation_kwargs)
-    generation_thread.start()
-
-    # Yield tokens as they come
-    for token in streamer:
+    # Stream response using Groq API
+    for token in _groq.generate_response_streaming(
+        system_message=system_msg,
+        user_message=user_prompt,
+        max_tokens=512,
+        temperature=0.7,
+    ):
         yield token
-
-    generation_thread.join()
 
 
 # ============================================================================
@@ -702,7 +678,9 @@ def chat(user_message: str, conversation_history: list = None) -> dict:
     Returns:
         dict with 'response', 'agent_type', 'context_used'
     """
-    if _llm is None:
+    global _groq
+    
+    if _groq is None:
         initialize_models()
 
     agent_type = detect_agent_type(user_message)
@@ -737,10 +715,10 @@ def generate_answer(prompt: str, agent_type: str = None) -> dict:
     2. Determine the best chart type
     3. Generate Chart.js configuration for frontend rendering
     """
-    if _llm is None:
+    global _groq, _energy_df, _cs_df
+    
+    if _groq is None:
         initialize_models()
-
-    model, tokenizer = _llm
 
     if agent_type is None or agent_type == "":
         agent_type = detect_agent_type(prompt)
@@ -777,8 +755,6 @@ def generate_answer(prompt: str, agent_type: str = None) -> dict:
                 query=prompt,
                 energy_df=_energy_df,
                 cs_df=_cs_df,
-                model=model,
-                tokenizer=tokenizer
             )
             
             if chart_config:
@@ -825,3 +801,8 @@ def _generate_viz_explanation(prompt: str, chart_config: dict) -> str:
     else:
         return f"Here's the visualization you requested: {title}"
 
+
+# ============================================================================
+# Compatibility - expose _llm as None for any code that checks it
+# ============================================================================
+_llm = None  # Kept for backward compatibility checks

@@ -12,7 +12,6 @@ from typing import Any, Dict, List
 import requests
 
 # import src.ranchocordova.chatbot_enhanced as chatbot_enhanced
-import torch
 from dotenv import load_dotenv
 from flask import (
     Flask,
@@ -55,18 +54,14 @@ from document_processors.specific_folder_reader import (
     OperationsDocumentProcessor,
     ProjectDocumentProcessor,
 )
-from src.ranchocordova.chatbot_unified import _llm, generate_answer, generate_response_streaming, initialize_models
+from src.ranchocordova.chatbot_unified import generate_answer, generate_response_streaming, initialize_models
 
-print("🔥 Warming models at startup")
+# Load environment variables
+load_dotenv()
+
+print("🔥 Initializing models at startup (using Groq API)")
 src.ranchocordova.chatbot_unified.initialize_models()
-
-model, tokenizer = src.ranchocordova.chatbot_unified._llm  # ✅ THIS WORKS
-
-inputs = tokenizer("warmup", return_tensors="pt").to(model.device)
-with torch.inference_mode():
-    model.generate(**inputs, max_new_tokens=1)
-
-print("🔥 Warm-up complete")
+print("🔥 Initialization complete")
 
 
 request_tracker = defaultdict(list)

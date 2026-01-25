@@ -1,11 +1,13 @@
+"""
+Download Models Script
+======================
+Downloads only the sentence-transformer embeddings model.
+The LLM is now served via Groq API (no local model needed).
+"""
+
 from sentence_transformers import SentenceTransformer
-from transformers import AutoModelForCausalLM, AutoTokenizer
 
-print("Downloading Qwen2.5-7B-Instruct...")
-AutoTokenizer.from_pretrained("Qwen/Qwen2.5-7B-Instruct")
-AutoModelForCausalLM.from_pretrained("Qwen/Qwen2.5-7B-Instruct")
-
-print("Downloading MiniLM embeddings...")
+print("Downloading MiniLM embeddings model...")
 SentenceTransformer("all-MiniLM-L6-v2")
 
-print("Download complete.")
+print("✅ Download complete. (LLM is served via Groq API)")
