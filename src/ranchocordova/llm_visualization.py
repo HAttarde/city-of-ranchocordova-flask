@@ -25,39 +25,44 @@ from .groq_client import get_groq_client
 # SYSTEM PROMPTS
 # ============================================================================
 
-VISUALIZATION_ANALYSIS_PROMPT = """You are a data visualization expert. Analyze the user's query and determine the best chart type and data to display.
+VISUALIZATION_ANALYSIS_PROMPT = """You are a data visualization expert. Analyze the user's query and determine if we have the RIGHT data to create a meaningful visualization.
 
-Available datasets:
+AVAILABLE DATASETS (these are the ONLY data we have):
 
-1. ENERGY DATA (energy_df):
+1. ENERGY CONSUMPTION DATA (energy_df) - Monthly electricity usage by customer:
    - CustomerID: Customer identifier (e.g., RC1001)
    - AccountType: "Residential" or "Commercial"
-   - Month: Date in YYYY-MM format (e.g., 2024-05)
-   - EnergyConsumption_kWh: Energy usage in kilowatt-hours (numeric)
+   - Month: Date in YYYY-MM format (2024-01 to 2024-05)
+   - EnergyConsumption_kWh: Electricity usage in kilowatt-hours
 
-2. CUSTOMER SERVICE DATA (cs_df):
-   - CallID: Call identifier
-   - CustomerID: Customer identifier
-   - CustomerName: Customer's full name
-   - DateTime: Date and time of call (e.g., 2024-05-01 09:03)
-   - Reason: Why they called (e.g., "Billing question", "Outage report", "Payment arrangement")
-   - Agent: Agent who handled the call
-   - Resolution: How the call was resolved
+2. CUSTOMER SERVICE CALLS (cs_df) - Call center records:
+   - CallID, CustomerID, CustomerName
+   - DateTime: Call timestamp
+   - Reason: Why they called (Billing, Outage, Payment, etc.)
+   - Agent, Resolution
 
-Based on the user's query, respond with a JSON object:
+IMPORTANT: Set "needs_visualization": false if the query asks about:
+- Renewable energy percentages (we don't have this data)
+- Solar/wind generation data (we don't have this)
+- Historical data before 2024 or after 2024-05 (we don't have this)
+- Specific document contents (use text response instead)
+- Anything NOT directly related to the datasets above
 
+Only set "needs_visualization": true if the query can be answered with the EXACT data columns we have.
+
+Respond with JSON:
 {{
     "needs_visualization": true or false,
-    "reasoning": "Brief explanation of why this chart type is appropriate",
+    "reasoning": "Explain: do we have the right data? If not, why?",
     "chart_type": "line" | "bar" | "pie" | "doughnut" | null,
     "dataset": "energy" | "customer_service",
     "data_spec": {{
         "x_column": "column name for x-axis/labels",
-        "y_column": "column name for y-axis/values",
+        "y_column": "column name for y-axis/values", 
         "aggregation": "sum" | "mean" | "count",
-        "group_by": "optional column to group by" or null,
+        "group_by": "column to group by" or null,
         "top_n": number or null,
-        "filters": [{{"column": "col", "operator": "==", "value": "val"}}] or []
+        "filters": []
     }},
     "chart_options": {{
         "title": "Descriptive chart title",
@@ -66,10 +71,10 @@ Based on the user's query, respond with a JSON object:
     }}
 }}
 
-Guidelines for chart type selection:
-- LINE: For trends over time (e.g., "show consumption trend", "forecast", "over time")
-- BAR: For comparisons between categories (e.g., "compare residential vs commercial", "top customers")
-- PIE/DOUGHNUT: For showing proportions/distribution (e.g., "breakdown", "distribution", "most common reasons")
+Guidelines:
+- LINE: Trends over time (monthly consumption trends)
+- BAR: Comparisons (residential vs commercial, top customers)
+- PIE: Distributions (call reasons breakdown, account type split)
 
 User query: "{query}"
 """
@@ -149,6 +154,16 @@ def _fallback_analysis(query: str) -> Optional[Dict]:
     Fallback analysis using keyword matching when LLM fails to produce valid JSON.
     """
     query_lower = query.lower()
+    
+    # REJECT: Topics we don't have data for
+    no_data_keywords = [
+        "renewable", "solar", "wind", "percentage", "percent", "%",
+        "5-year", "five year", "5 year", "annual report", "summary",
+        "carbon", "emissions", "greenhouse", "generation", "produced"
+    ]
+    if any(kw in query_lower for kw in no_data_keywords):
+        print("ℹ️ Fallback: Query asks for data we don't have - skipping visualization")
+        return {"needs_visualization": False, "reasoning": "Data not available in our datasets"}
     
     # Detect if visualization is needed - expanded patterns
     viz_keywords = ["chart", "graph", "plot", "show", "visualize", "display", "trend", "compare", "breakdown"]
